@@ -1,0 +1,125 @@
+"use client";
+
+import { useState } from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { Loader2, LogIn } from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/password-input";
+import { createClient } from "@/utils/supabase/client";
+
+const formSchema = z.object({
+  email: z.email({
+    error: (iss) =>
+      iss.input === "" ? "Por favor, ingresa tu correo electrónico" : undefined,
+  }),
+  password: z
+    .string()
+    .min(1, "Por favor, ingresa tu contraseña")
+    .min(7, "La contraseña debe tener al menos 7 caracteres"),
+});
+
+interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> {
+  redirectTo?: string;
+}
+
+export function UserAuthForm({
+  className,
+  redirectTo,
+  ...props
+}: UserAuthFormProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (error) {
+        console.log({ error });
+
+        return toast.error(
+          "!El correo electrónico o la contraseña son incorrectos!"
+        );
+      }
+
+      toast.success("¡Inicio de sesión exitosamente!");
+      router.push("/dashboard");
+    } catch (err: any) {
+      console.log(JSON.stringify(err, null, 2));
+      return toast.error(
+        "!El correo electrónico o la contraseña son incorrectos!"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={cn("grid gap-3", className)}
+        {...props}
+      >
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="nombre@ejemplo.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="relative">
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <PasswordInput placeholder="********" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button className="mt-2" disabled={isLoading}>
+          {isLoading ? <Loader2 className="animate-spin" /> : <LogIn />}
+          Iniciar sesión
+        </Button>
+      </form>
+    </Form>
+  );
+}
