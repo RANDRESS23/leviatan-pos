@@ -22,10 +22,7 @@ import { PasswordInput } from "@/components/password-input";
 import { createClient } from "@/utils/supabase/client";
 
 const formSchema = z.object({
-  email: z.email({
-    error: (iss) =>
-      iss.input === "" ? "Por favor, ingresa tu correo electrónico" : undefined,
-  }),
+  email: z.email("Por favor, ingresa un correo electrónico válido"),
   password: z
     .string()
     .min(1, "Por favor, ingresa tu contraseña")
