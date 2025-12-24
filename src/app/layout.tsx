@@ -38,8 +38,8 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <DirectionProvider>{children}</DirectionProvider>
+            <Toaster position="top-center" richColors />
           </ThemeProvider>
-          <Toaster position="top-center" richColors />
         </AuthProvideer>
       </body>
     </html>
