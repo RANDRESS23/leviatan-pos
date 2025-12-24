@@ -1,0 +1,559 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Empresa {
+  id                String  @id @default(uuid())
+  nombre            String  @unique @db.VarChar(100)
+  emailContacto     String? @db.VarChar(50)
+  telefono          String? @db.VarChar(20)
+  moduloRestaurante Boolean @default(false)
+  estadoId          String
+
+  estado Estado @relation(fields: [estadoId], references: [id])
+
+  usuarios    Usuario[]
+  clientes    Cliente[]
+  proveedores Proveedor[]
+  categorias  Categoria[]
+  productos   Producto[]
+  ventas      Venta[]
+  cajas       Caja[]
+  metodosPago MetodoPago[]
+  roles       Rol[]
+  compras     Compra[]
+  nominas     Nomina[]
+  empleados   Empleado[]
+  egresos     Egresos[]
+  impuestos   Impuesto[]
+  mesas       Mesa[]
+  pedidos     Pedido[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([estadoId])
+}
+
+model Usuario {
+  id               String  @id @default(uuid())
+  authId           String  @unique
+  empresaId        String
+  primer_nombre    String  @db.VarChar(50)
+  segundo_nombre   String? @db.VarChar(50)
+  primer_apellido  String  @db.VarChar(50)
+  segundo_apellido String? @db.VarChar(50)
+  email            String  @db.VarChar(50)
+  telefono         String  @db.VarChar(20)
+  activo           Boolean @default(true)
+  password         String
+
+  empresa Empresa @relation(fields: [empresaId], references: [id])
+
+  roles   UsuarioRol[]
+  ventas  Venta[]
+  cajas   Caja[]
+  compras Compra[]
+  nominas Nomina[]
+  egresos Egresos[]
+  pedidos Pedido[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([activo])
+}
+
+model TipoDocumento {
+  id            String @id @default(uuid())
+  tipoDocumento String @unique @db.VarChar(50)
+
+  cliente   Cliente[]
+  empleados Empleado[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cliente {
+  id               String  @id @default(uuid())
+  empresaId        String
+  primer_nombre    String  @db.VarChar(50)
+  segundo_nombre   String? @db.VarChar(50)
+  primer_apellido  String  @db.VarChar(50)
+  segundo_apellido String? @db.VarChar(50)
+  tipoDocumentoId  String
+  numeroDocumento  String  @unique @db.VarChar(20)
+  email            String  @db.VarChar(50)
+  telefono         String  @db.VarChar(20)
+  direccion        String  @db.VarChar(50)
+  activo           Boolean @default(true)
+
+  empresa       Empresa       @relation(fields: [empresaId], references: [id])
+  tipoDocumento TipoDocumento @relation(fields: [tipoDocumentoId], references: [id])
+  ventas        Venta[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([tipoDocumentoId])
+  @@index([activo])
+}
+
+model Rol {
+  id          String  @id @default(uuid())
+  empresaId   String
+  nombre      String  @db.VarChar(50)
+  descripcion String? @db.VarChar(100)
+
+  empresa Empresa @relation(fields: [empresaId], references: [id])
+
+  permisos RolPermiso[]
+  usuarios UsuarioRol[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+}
+
+model Permiso {
+  id          String  @id @default(uuid())
+  codigo      String  @unique @db.VarChar(50)
+  descripcion String? @db.VarChar(50)
+
+  roles RolPermiso[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RolPermiso {
+  rolId     String
+  permisoId String
+
+  rol     Rol     @relation(fields: [rolId], references: [id])
+  permiso Permiso @relation(fields: [permisoId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([rolId, permisoId])
+  @@index([permisoId])
+}
+
+model UsuarioRol {
+  usuarioId String
+  rolId     String
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+  rol     Rol     @relation(fields: [rolId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([usuarioId, rolId])
+  @@index([rolId])
+}
+
+model Proveedor {
+  id            String  @id @default(uuid())
+  empresaId     String
+  nit           String?
+  nombre        String  @db.VarChar(100)
+  telefono      String  @db.VarChar(20)
+  direccion     String  @db.VarChar(100)
+  tipoProveedor String  @db.VarChar(20) // Natural, Empresa
+  activo        Boolean @default(true)
+
+  empresa Empresa @relation(fields: [empresaId], references: [id])
+
+  compras Compra[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([activo])
+}
+
+model Impuesto {
+  id                String  @id @default(uuid())
+  empresaId         String
+  tributo           String  @db.VarChar(10) // IVA, INC, IBUA, ICUI
+  nombre            String  @db.VarChar(200)
+  tipoValorImpuesto String  @db.VarChar(20) // Porcentaje o Pesos
+  valor             Decimal
+  activo            Boolean @default(true)
+
+  empresa Empresa @relation(fields: [empresaId], references: [id])
+
+  producto Producto[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([activo])
+}
+
+model Categoria {
+  id        String  @id @default(uuid())
+  empresaId String
+  nombre    String  @db.VarChar(100)
+  activa    Boolean @default(true)
+
+  empresa   Empresa    @relation(fields: [empresaId], references: [id])
+  productos Producto[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([activa])
+}
+
+model Producto {
+  id                  String   @id @default(uuid())
+  empresaId           String
+  categoriaId         String
+  impuestoId          String
+  nombre              String   @db.VarChar(100)
+  codigoBarras        String?  @db.VarChar(100)
+  descripcion         String?  @db.VarChar(100)
+  costo               Decimal?
+  precio              Decimal
+  activo              Boolean  @default(true)
+  tieneStock          Boolean  @default(false)
+  stock               Int?
+  tienePresentaciones Boolean  @default(false)
+
+  empresa   Empresa   @relation(fields: [empresaId], references: [id])
+  categoria Categoria @relation(fields: [categoriaId], references: [id])
+  impuesto  Impuesto  @relation(fields: [impuestoId], references: [id])
+
+  detallesVenta  DetalleVenta[]
+  presentaciones ProductoPresentacion[]
+  compras        Compra[]
+  detallePedidos DetallePedido[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([categoriaId])
+  @@index([impuestoId])
+  @@index([activo])
+}
+
+model ProductoPresentacion {
+  id         String   @id @default(uuid())
+  productoId String
+  nombre     String   @db.VarChar(100) // Talla M, 500ml, etc
+  costo      Decimal?
+  precio     Decimal
+  stock      Int
+  activo     Boolean  @default(true)
+
+  producto      Producto       @relation(fields: [productoId], references: [id])
+  detallesVenta DetalleVenta[]
+  compras       Compra[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productoId])
+  @@index([activo])
+}
+
+model Venta {
+  id        String   @id @default(uuid())
+  empresaId String
+  usuarioId String
+  cajaId    String?
+  clienteId String?
+  total     Decimal
+  estadoId  String
+  fecha     DateTime @default(now())
+  propina   Decimal?
+
+  empresa Empresa  @relation(fields: [empresaId], references: [id])
+  usuario Usuario  @relation(fields: [usuarioId], references: [id])
+  cliente Cliente? @relation(fields: [clienteId], references: [id])
+  estado  Estado   @relation(fields: [estadoId], references: [id])
+  caja    Caja?    @relation(fields: [cajaId], references: [id])
+
+  detalles DetalleVenta[]
+  pagos    Pago[]
+  pedidos  Pedido[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([usuarioId])
+  @@index([estadoId])
+  @@index([fecha])
+  @@index([empresaId, fecha])
+}
+
+model DetalleVenta {
+  id             String  @id @default(uuid())
+  ventaId        String
+  productoId     String
+  presentacionId String?
+  cantidad       Int
+  precioUnitario Decimal
+  subtotal       Decimal
+
+  venta        Venta                 @relation(fields: [ventaId], references: [id])
+  producto     Producto              @relation(fields: [productoId], references: [id])
+  presentacion ProductoPresentacion? @relation(fields: [presentacionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ventaId])
+  @@index([productoId])
+}
+
+model MetodoPago {
+  id        String  @id @default(uuid())
+  empresaId String
+  nombre    String // Efectivo, Tarjeta, Nequi, etc
+  activo    Boolean @default(true)
+
+  empresa Empresa @relation(fields: [empresaId], references: [id])
+  pagos   Pago[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([activo])
+}
+
+model Pago {
+  id            String  @id @default(uuid())
+  ventaId       String
+  metodoPagoId  String
+  montoRecibido Decimal
+  montoDevuelto Decimal
+
+  venta      Venta      @relation(fields: [ventaId], references: [id])
+  metodoPago MetodoPago @relation(fields: [metodoPagoId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ventaId])
+  @@index([metodoPagoId])
+}
+
+model Caja {
+  id             String   @id @default(uuid())
+  empresaId      String
+  usuarioId      String
+  abierta        Boolean  @default(true)
+  saldoInicial   Decimal
+  saldoFinal     Decimal
+  saldoFinalReal Decimal
+  abiertaEn      DateTime @default(now())
+  cerradaEn      DateTime
+  observaciones  String?  @db.VarChar(200)
+
+  empresa Empresa @relation(fields: [empresaId], references: [id])
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+
+  ventas Venta[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([usuarioId])
+  @@index([abierta])
+}
+
+model Estado {
+  id     String @id @default(uuid())
+  codigo String @unique @db.VarChar(30) // ACTIVO, INACTIVO, PAGADO, ANULADO
+
+  empresas Empresa[]
+  ventas   Venta[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Compra {
+  id             String   @id @default(uuid())
+  empresaId      String
+  usuarioId      String
+  productoId     String
+  presentacionId String?
+  proveedorId    String
+  cantidad       Int
+  total          Decimal
+  fecha          DateTime
+  descripcion    String?  @db.VarChar(200)
+
+  empresa      Empresa               @relation(fields: [empresaId], references: [id])
+  usuario      Usuario               @relation(fields: [usuarioId], references: [id])
+  producto     Producto              @relation(fields: [productoId], references: [id])
+  presentacion ProductoPresentacion? @relation(fields: [presentacionId], references: [id])
+  proveedor    Proveedor             @relation(fields: [proveedorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([usuarioId])
+  @@index([proveedorId])
+  @@index([fecha])
+}
+
+model Empleado {
+  id               String  @id @default(uuid())
+  empresaId        String
+  primer_nombre    String  @db.VarChar(50)
+  segundo_nombre   String? @db.VarChar(50)
+  primer_apellido  String  @db.VarChar(50)
+  segundo_apellido String? @db.VarChar(50)
+  tipoDocumentoId  String
+  numeroDocumento  String  @unique @db.VarChar(20)
+  email            String  @db.VarChar(50)
+  telefono         String  @db.VarChar(20)
+  direccion        String  @db.VarChar(50)
+  activo           Boolean @default(true)
+
+  empresa       Empresa       @relation(fields: [empresaId], references: [id])
+  tipoDocumento TipoDocumento @relation(fields: [tipoDocumentoId], references: [id])
+
+  nominas Nomina[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([tipoDocumentoId])
+  @@index([activo])
+}
+
+model Nomina {
+  id          String   @id @default(uuid())
+  empresaId   String
+  usuarioId   String
+  empleadoId  String
+  fecha       DateTime @default(now())
+  total       Decimal
+  descripcion String?  @db.VarChar(200)
+
+  empresa  Empresa  @relation(fields: [empresaId], references: [id])
+  usuario  Usuario  @relation(fields: [usuarioId], references: [id])
+  empleado Empleado @relation(fields: [empleadoId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([empleadoId])
+  @@index([fecha])
+}
+
+model Egresos {
+  id          String   @id @default(uuid())
+  empresaId   String
+  usuarioId   String
+  fecha       DateTime
+  fuente      String   @db.VarChar(50) // Dinero sacado de: Caja, General
+  motivo      String   @db.VarChar(100)
+  valor       Decimal
+  descripcion String?  @db.VarChar(200)
+
+  empresa Empresa @relation(fields: [empresaId], references: [id])
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([usuarioId])
+  @@index([fecha])
+}
+
+model Mesa {
+  id        String  @id @default(uuid())
+  empresaId String
+  nombre    String  @db.VarChar(20) // Mesa 1, M2, etc
+  capacidad Int
+  activa    Boolean @default(true)
+
+  empresa Empresa @relation(fields: [empresaId], references: [id])
+
+  pedidos Pedido[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([activa])
+}
+
+model Pedido {
+  id        String  @id @default(uuid())
+  empresaId String
+  mesaId    String?
+  usuarioId String
+  ventaId   String? // Cuando se factura
+  total     Decimal
+  domicilio Boolean @default(false)
+  activo    Boolean @default(true)
+
+  empresa Empresa @relation(fields: [empresaId], references: [id])
+  mesa    Mesa?   @relation(fields: [mesaId], references: [id])
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+  venta   Venta?  @relation(fields: [ventaId], references: [id])
+
+  detallePedidos DetallePedido[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@index([mesaId])
+  @@index([usuarioId])
+  @@index([activo])
+}
+
+model DetallePedido {
+  id             String  @id @default(uuid())
+  pedidoId       String
+  productoId     String
+  cantidad       Int
+  precioUnitario Decimal
+  subtotal       Decimal
+  observacion    String? @db.VarChar(200)
+
+  pedido   Pedido   @relation(fields: [pedidoId], references: [id])
+  producto Producto @relation(fields: [productoId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pedidoId])
+  @@index([productoId])
+}
