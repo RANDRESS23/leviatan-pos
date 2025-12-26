@@ -1,4 +1,3 @@
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClientForServer } from './utils/supabase/server';
 
@@ -12,18 +11,31 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  const authRoutes = ['/sign-in'];
-  // Protect specific routes (e.g., a '/dashboard' route)
-  // const protectedRoutes = ['/dashboard', '/profile'];
-  if (!session && !authRoutes.includes(req.nextUrl.pathname)) {
+  let verifiedUser = null;
+  if (session) {
+    const { data: { user }, error } = await supabase.auth.getUser(session.access_token);
+    if (!error && user) {
+      verifiedUser = user;
+    }
+  }
+
+  const routesWithoutAuth = ['/sign-in'];
+  const protectedRoutes = ['/companies'];
+
+  if (!verifiedUser && !routesWithoutAuth.includes(req.nextUrl.pathname)) {
     const redirectUrl = req.nextUrl.clone();
     redirectUrl.pathname = '/sign-in';
     return NextResponse.redirect(redirectUrl);
   }
 
+  if (verifiedUser?.id === process.env.ID_SUPER_ADMIN 
+    && !protectedRoutes.includes(req.nextUrl.pathname)) {
+    return NextResponse.redirect(new URL('/companies', req.url));
+  }
+
   // If the user is on the login page but already has a session, redirect to dashboard
-  if (session && authRoutes.includes(req.nextUrl.pathname)) {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
+  if (verifiedUser && verifiedUser?.id !== process.env.ID_SUPER_ADMIN && (routesWithoutAuth.includes(req.nextUrl.pathname) || protectedRoutes.includes(req.nextUrl.pathname))) {
+    return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
   // Return the response, which may have updated cookies
@@ -32,11 +44,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    // '/',
-    // '/dashboard/:path*', // Protects /dashboard and all subpaths
-    // '/profile/:path*',
-    // '/login',
-    // '/signup',
     // Exclude static assets, images, and internal Next.js routes
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
