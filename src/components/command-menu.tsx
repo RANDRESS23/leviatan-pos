@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { ArrowRight, ChevronRight, Laptop, Moon, Sun } from "lucide-react";
 import { useSearch } from "@/context/search-provider";
 import { useTheme } from "next-themes";
@@ -18,7 +18,7 @@ import { sidebarData } from "./layout/data/sidebar-data";
 import { ScrollArea } from "./ui/scroll-area";
 
 export function CommandMenu() {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const { setTheme } = useTheme();
   const { open, setOpen } = useSearch();
 

@@ -40,16 +40,16 @@ export function DataTableViewOptions<TData>({
           )
           .map((column) => {
             const label =
-              column.id === "emailContacto"
-                ? "Email"
+              column.id === "emailContacto" || column.id === "email"
+                ? "Correo electrónico"
                 : column.id === "telefono"
                   ? "Teléfono"
                   : column.id === "moduloRestaurante"
                     ? "Módulo Restaurante"
-                    : column.id === "estado"
+                    : column.id === "estado" || column.id === "activo"
                       ? "Estado"
                       : column.id === "id"
-                        ? "ID Empresa"
+                        ? "ID"
                         : column.id;
 
             return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
@@ -11,7 +11,7 @@ interface SignOutDialogProps {
 }
 
 export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const supabase = createClient();
 
   const handleSignOut = async () => {
