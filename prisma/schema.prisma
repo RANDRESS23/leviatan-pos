@@ -16,9 +16,10 @@ datasource db {
 model Empresa {
   id                String  @id @default(uuid())
   nombre            String  @unique @db.VarChar(100)
-  emailContacto     String? @db.VarChar(50)
-  telefono          String? @db.VarChar(20)
+  emailContacto     String? @unique @db.VarChar(50)
+  telefono          String? @unique @db.VarChar(20)
   moduloRestaurante Boolean @default(false)
+  ceoAsignado       Boolean @default(false)
   estadoId          String
 
   estado Estado @relation(fields: [estadoId], references: [id])
@@ -50,18 +51,19 @@ model Usuario {
   id               String  @id @default(uuid())
   authId           String  @unique
   empresaId        String
+  rolId            String
   primer_nombre    String  @db.VarChar(50)
   segundo_nombre   String? @db.VarChar(50)
   primer_apellido  String  @db.VarChar(50)
   segundo_apellido String? @db.VarChar(50)
-  email            String  @db.VarChar(50)
-  telefono         String  @db.VarChar(20)
+  email            String  @unique @db.VarChar(50)
+  telefono         String  @unique @db.VarChar(20)
   activo           Boolean @default(true)
   password         String
 
   empresa Empresa @relation(fields: [empresaId], references: [id])
+  rol     Rol     @relation(fields: [rolId], references: [id])
 
-  roles   UsuarioRol[]
   ventas  Venta[]
   cajas   Caja[]
   compras Compra[]
@@ -96,8 +98,8 @@ model Cliente {
   segundo_apellido String? @db.VarChar(50)
   tipoDocumentoId  String
   numeroDocumento  String  @unique @db.VarChar(20)
-  email            String  @db.VarChar(50)
-  telefono         String  @db.VarChar(20)
+  email            String  @unique @db.VarChar(50)
+  telefono         String  @unique @db.VarChar(20)
   direccion        String  @db.VarChar(50)
   activo           Boolean @default(true)
 
@@ -116,13 +118,13 @@ model Cliente {
 model Rol {
   id          String  @id @default(uuid())
   empresaId   String
-  nombre      String  @db.VarChar(50)
+  nombre      String  @unique @db.VarChar(50)
   descripcion String? @db.VarChar(100)
 
   empresa Empresa @relation(fields: [empresaId], references: [id])
 
   permisos RolPermiso[]
-  usuarios UsuarioRol[]
+  usuarios Usuario[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -153,20 +155,6 @@ model RolPermiso {
 
   @@id([rolId, permisoId])
   @@index([permisoId])
-}
-
-model UsuarioRol {
-  usuarioId String
-  rolId     String
-
-  usuario Usuario @relation(fields: [usuarioId], references: [id])
-  rol     Rol     @relation(fields: [rolId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@id([usuarioId, rolId])
-  @@index([rolId])
 }
 
 model Proveedor {

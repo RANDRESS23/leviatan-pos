@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/context/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { DirectionProvider } from "@/context/direction-provider";
 import { AuthProvideer } from "@/context/auth-provider";
+import { ViewTransitions } from "next-view-transitions";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,21 +28,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <head />
-      <body>
-        <AuthProvideer>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <DirectionProvider>{children}</DirectionProvider>
-            <Toaster position="top-center" richColors />
-          </ThemeProvider>
-        </AuthProvideer>
-      </body>
-    </html>
+    <ViewTransitions>
+      <html lang="es" suppressHydrationWarning>
+        <head />
+        <body>
+          <AuthProvideer>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <DirectionProvider>{children}</DirectionProvider>
+              <Toaster position="top-center" richColors />
+            </ThemeProvider>
+          </AuthProvideer>
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }

@@ -15,7 +15,7 @@ export default function Page() {
       <div className="relative w-full max-w-md px-4">
         {/* Logo/Brand section */}
         <div className="mb-8 text-center">
-          <h1 className="mb-2 text-4xl font-bold">Leviatán POS</h1>
+          <h1 className="mb-2 text-4xl font-bold">Leviatan POS</h1>
           <p className="text-sm text-muted-foreground">
             Bienvenido de nuevo, inicia sesión para continuar
           </p>
