@@ -9,7 +9,16 @@ export const getUserByAuthId = async (authId: string) => {
         authId
       },
       include: {
-        empresa: {  include: { estado: { select: { codigo: true } } }}
+        empresa: {  include: { estado: { select: { codigo: true } } }},
+        rol: { include: { 
+          permisos: {
+          include: {
+            permiso: {
+              select: { id: true, codigo: true, descripcion: true }
+            }
+          }
+        }
+        }}
       }
     });
 

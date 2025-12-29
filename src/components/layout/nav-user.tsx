@@ -1,12 +1,5 @@
 import { Link } from "next-view-transitions";
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react";
+import { ChevronsUpDown, LogOut, ShieldUser } from "lucide-react";
 import useDialogState from "@/hooks/use-dialog-state";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -25,18 +18,15 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { SignOutDialog } from "@/components/sign-out-dialog";
+import { useAuth } from "@/hooks/use-auth";
 
-type NavUserProps = {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-};
-
-export function NavUser({ user }: NavUserProps) {
+export function NavUser() {
   const { isMobile } = useSidebar();
   const [open, setOpen] = useDialogState();
+  const { user, authUser } = useAuth();
+  const isSuperAdmin =
+    authUser?.email === process.env.NEXT_PUBLIC_EMAIL_SUPER_ADMIN;
+  const permisos = user?.rol.permisos.map((p) => p.permiso.codigo);
 
   return (
     <>
@@ -49,12 +39,29 @@ export function NavUser({ user }: NavUserProps) {
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">SN</AvatarFallback>
+                  {/* <AvatarImage
+                    src={user.avatar}
+                    alt={
+                      user?.primer_nombre
+                        ? `${user.primer_nombre} ${user.primer_apellido}`
+                        : "Raúl Quimbaya"
+                    }
+                  /> */}
+                  <AvatarFallback className="rounded-lg">
+                    {user?.primer_nombre
+                      ? `${user.primer_nombre.charAt(0)?.toUpperCase()}${user.primer_apellido.charAt(0)?.toUpperCase()}`
+                      : "RQ"}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-start text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate font-semibold">
+                    {user?.primer_nombre
+                      ? `${user.primer_nombre} ${user.primer_apellido}`
+                      : "Raúl Quimbaya"}
+                  </span>
+                  <span className="truncate text-xs">
+                    {user?.email || authUser?.email || "usuario@ejemplo.com"}
+                  </span>
                 </div>
                 <ChevronsUpDown className="ms-auto size-4" />
               </SidebarMenuButton>
@@ -68,50 +75,53 @@ export function NavUser({ user }: NavUserProps) {
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="rounded-lg">SN</AvatarFallback>
+                    {/* <AvatarImage
+                      src={user.avatar}
+                      alt={
+                        user?.primer_nombre
+                          ? `${user.primer_nombre} ${user.primer_apellido}`
+                          : "Raúl Quimbaya"
+                      }
+                    /> */}
+                    <AvatarFallback className="rounded-lg">
+                      {user?.primer_nombre
+                        ? `${user.primer_nombre.charAt(0)?.toUpperCase()}${user.primer_apellido.charAt(0)?.toUpperCase()}`
+                        : "RQ"}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-start text-sm leading-tight">
-                    <span className="truncate font-semibold">{user.name}</span>
-                    <span className="truncate text-xs">{user.email}</span>
+                    <span className="truncate font-semibold">
+                      {user?.primer_nombre
+                        ? `${user.primer_nombre} ${user.primer_apellido}`
+                        : "Raúl Quimbaya"}
+                    </span>
+                    <span className="truncate text-xs">
+                      {user?.email || authUser?.email || "usuario@ejemplo.com"}
+                    </span>
                   </div>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <Sparkles />
-                  Upgrade to Pro
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                  <Link href="/settings/account">
-                    <BadgeCheck />
-                    Account
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/settings">
-                    <CreditCard />
-                    Billing
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/settings/notifications">
-                    <Bell />
-                    Notifications
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
+              {!isSuperAdmin && permisos?.includes("ROLES_PERMISOS") && (
+                <>
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href="/roles-and-permissions">
+                        <ShieldUser />
+                        Roles y Permisos
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem
                 variant="destructive"
                 onClick={() => setOpen(true)}
+                className="cursor-pointer"
               >
                 <LogOut />
-                Sign out
+                Cerrar sesión
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Check, Moon, Sun } from "lucide-react";
+import { Check, Laptop, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -33,22 +33,33 @@ export function ThemeSwitch() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light{" "}
+        <DropdownMenuItem
+          onClick={() => setTheme("light")}
+          className="cursor-pointer"
+        >
+          <Sun /> <span>Claro </span>
           <Check
             size={14}
             className={cn("ms-auto", theme !== "light" && "hidden")}
           />
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
+        <DropdownMenuItem
+          onClick={() => setTheme("dark")}
+          className="cursor-pointer"
+        >
+          <Moon className="scale-90" />
+          <span>Oscuro </span>
           <Check
             size={14}
             className={cn("ms-auto", theme !== "dark" && "hidden")}
           />
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
+        <DropdownMenuItem
+          onClick={() => setTheme("system")}
+          className="cursor-pointer"
+        >
+          <Laptop />
+          <span>Sistema</span>
           <Check
             size={14}
             className={cn("ms-auto", theme !== "system" && "hidden")}

@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   Monitor,
   Bug,
-  ListTodo,
   FileX,
   HelpCircle,
   Lock,
@@ -16,36 +15,67 @@ import {
   UserCog,
   UserX,
   Users,
-  MessagesSquare,
   ShieldCheck,
-  AudioWaveform,
   Command,
   GalleryVerticalEnd,
+  Building,
+  Truck,
+  FileText,
+  ShoppingCart,
+  BanknoteArrowDown,
+  UserRoundCog,
+  ShoppingBasket,
+  Receipt,
+  Wallet,
 } from 'lucide-react'
-import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
+
+export const APP_URLS = {
+  DASHBOARD: "/dashboard",
+  USUARIOS: "/users",
+  CLIENTES: "/clients",
+  PROVEEDORES: "/suppliers",
+  CATEGORIAS: "/categories",
+  PRODUCTOS: "/products",
+  FACTURAS: "/invoices",
+  VENTAS_RAPIDAS: "/quick-sales",
+  CIERRE_CAJA: "/cash-close",
+  COMPRAS: "/purchases",
+  EMPLEADOS: "/employees",
+  NOMINA: "/payroll",
+  EGRESOS: "/expenses",
+  IMPUESTOS: "/taxes",
+  ROLES_PERMISOS: "/roles-and-permissions",
+}
 
 export const sidebarData: SidebarData = {
   user: {
-    name: 'satnaing',
-    email: 'satnaingdev@gmail.com',
-    avatar: '/avatars/shadcn.jpg',
+    name: 'leviatanpos',
+    email: 'leviatanpos@gmail.com',
+    avatar: '',
   },
   teams: [
     {
-      name: 'Shadcn Admin',
+      name: 'Leviatan POS',
       logo: Command,
-      plan: 'Vite + ShadcnUI',
-    },
+      plan: 'Leviatan POS',
+    }
+  ],
+  navGroupsSuperAdmin: [
     {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
+      title: 'General',
+      items: [
+        {
+          title: 'Empresas',
+          url: '/companies',
+          icon: Building,
+        },
+        {
+          title: 'Usuarios',
+          url: APP_URLS.USUARIOS,
+          icon: Users,
+        }
+      ],
     },
   ],
   navGroups: [
@@ -54,48 +84,82 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: 'Dashboard',
-          url: '/dashboard',
+          url: APP_URLS.DASHBOARD,
           icon: LayoutDashboard,
+          permissionCode: "DASHBOARD"
         },
         {
-          title: 'Tasks',
-          url: '/tasks',
-          icon: ListTodo,
+          title: 'Usuarios',
+          url: APP_URLS.USUARIOS,
+          icon: UserRoundCog,
+          permissionCode: "USUARIOS"
         },
         {
-          title: 'Apps',
-          url: '/apps',
-          icon: Package,
-        },
-        {
-          title: 'Chats',
-          url: '/chats',
-          badge: '3',
-          icon: MessagesSquare,
-        },
-        {
-          title: 'Users',
-          url: '/users',
+          title: 'Clientes',
+          url: APP_URLS.CLIENTES,
           icon: Users,
+          permissionCode: "CLIENTES"
         },
         {
-          title: 'Secured by Clerk',
-          icon: ClerkLogo,
-          items: [
-            {
-              title: 'Sign In',
-              url: '/clerk/sign-in',
-            },
-            {
-              title: 'Sign Up',
-              url: '/clerk/sign-up',
-            },
-            {
-              title: 'User Management',
-              url: '/clerk/user-management',
-            },
-          ],
+          title: 'Proveedores',
+          url: APP_URLS.PROVEEDORES,
+          icon: Truck,
+          permissionCode: "PROVEEDORES"
         },
+        {
+          title: 'Categorías',
+          url: APP_URLS.CATEGORIAS,
+          icon: GalleryVerticalEnd,
+          permissionCode: "CATEGORIAS"
+        },
+        {
+          title: 'Productos',
+          url: APP_URLS.PRODUCTOS,
+          icon: Package,
+          permissionCode: "PRODUCTOS"
+        },
+        {
+          title: 'Facturas',
+          url: APP_URLS.FACTURAS,
+          icon: FileText,
+          permissionCode: "FACTURAS"
+        },
+        {
+          title: 'Ventas Rápidas',
+          url: APP_URLS.VENTAS_RAPIDAS,
+          icon: ShoppingCart,
+          permissionCode: "VENTAS_RAPIDAS"
+        },
+        {
+          title: 'Cierre de Caja',
+          url: APP_URLS.CIERRE_CAJA,
+          icon: BanknoteArrowDown,
+          permissionCode: "CIERRE_CAJA"
+        },
+        {
+          title: 'Compras',
+          url: APP_URLS.COMPRAS,
+          icon: ShoppingBasket,
+          permissionCode: "COMPRAS"
+        },
+        {
+          title: 'Empleados',
+          url: APP_URLS.EMPLEADOS,
+          icon: Users,
+          permissionCode: "EMPLEADOS"
+        },
+        {
+          title: 'Nómina',
+          url: APP_URLS.NOMINA,
+          icon: Receipt,
+          permissionCode: "NOMINA"
+        },
+        {
+          title: 'Egresos',
+          url: APP_URLS.EGRESOS,
+          icon: Wallet,
+          permissionCode: "EGRESOS"
+        }
       ],
     },
     {

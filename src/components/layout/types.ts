@@ -1,4 +1,4 @@
-import { type LinkProps } from '@tanstack/react-router'
+import { type LinkProps } from 'next/link'
 
 type User = {
   name: string
@@ -19,13 +19,15 @@ type BaseNavItem = {
 }
 
 type NavLink = BaseNavItem & {
-  url: LinkProps['to'] | (string & {})
+  url: LinkProps['href'] | (string & {})
   items?: never
+  permissionCode?: string
 }
 
 type NavCollapsible = BaseNavItem & {
-  items: (BaseNavItem & { url: LinkProps['to'] | (string & {}) })[]
+  items: (BaseNavItem & { url: LinkProps['href'] | (string & {}) })[]
   url?: never
+  permissionCode?: string
 }
 
 type NavItem = NavCollapsible | NavLink
@@ -39,6 +41,7 @@ type SidebarData = {
   user: User
   teams: Team[]
   navGroups: NavGroup[]
+  navGroupsSuperAdmin: NavGroup[]
 }
 
 export type { SidebarData, NavGroup, NavItem, NavCollapsible, NavLink }

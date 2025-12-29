@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClientForServer } from './utils/supabase/server';
+import { APP_URLS } from './components/layout/data/sidebar-data';
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
@@ -19,8 +20,9 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  const routesWithoutAuth = ['/sign-in'];
-  const protectedRoutes = ['/companies'];
+  const routesWithoutAuth = ['/', '/sign-in'];
+  const protectedRoutesSuperAdmin = ['/companies'];
+  const protectedRoutes = ['/companies', APP_URLS.USUARIOS];
 
   if (!verifiedUser && !routesWithoutAuth.includes(req.nextUrl.pathname)) {
     const redirectUrl = req.nextUrl.clone();
@@ -34,7 +36,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // If the user is on the login page but already has a session, redirect to dashboard
-  if (verifiedUser && verifiedUser?.id !== process.env.ID_SUPER_ADMIN && (routesWithoutAuth.includes(req.nextUrl.pathname) || protectedRoutes.includes(req.nextUrl.pathname))) {
+  if (verifiedUser && verifiedUser?.id !== process.env.ID_SUPER_ADMIN && (routesWithoutAuth.includes(req.nextUrl.pathname) || protectedRoutesSuperAdmin.includes(req.nextUrl.pathname))) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 

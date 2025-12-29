@@ -15,6 +15,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/hooks/use-auth";
 
 type TeamSwitcherProps = {
   teams: {
@@ -27,6 +28,7 @@ type TeamSwitcherProps = {
 export function TeamSwitcher({ teams }: TeamSwitcherProps) {
   const { isMobile } = useSidebar();
   const [activeTeam, setActiveTeam] = React.useState(teams[0]);
+  const { user } = useAuth();
 
   return (
     <SidebarMenu>
@@ -36,7 +38,9 @@ export function TeamSwitcher({ teams }: TeamSwitcherProps) {
         </div>
         <div className="grid flex-1 text-start text-sm leading-tight">
           <span className="truncate font-semibold">{activeTeam.name}</span>
-          <span className="truncate text-xs">{activeTeam.plan}</span>
+          <span className="truncate text-xs">
+            {user?.empresa?.nombre || activeTeam.plan}
+          </span>
         </div>
       </SidebarMenuItem>
     </SidebarMenu>

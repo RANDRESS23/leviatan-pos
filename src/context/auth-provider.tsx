@@ -9,6 +9,7 @@ export type User = {
   id: string;
   authId: string;
   empresaId: string;
+  rolId: string;
   primer_nombre: string;
   segundo_nombre?: string;
   primer_apellido: string;
@@ -23,6 +24,24 @@ export type User = {
     estado: {
       codigo: string;
     };
+  };
+  rol: {
+    id: string;
+    nombre: string;
+    descripcion?: string;
+    permisos: {
+      rolId: string;
+      permisoId: string;
+      permiso: {
+        id: string;
+        codigo: string;
+        descripcion?: string;
+      };
+      createdAt: Date;
+      updatedAt: Date;
+    }[];
+    createdAt: Date;
+    updatedAt: Date;
   };
 };
 

@@ -53,7 +53,7 @@ export function SelectDropdown({
           </SelectItem>
         ) : (
           items?.map(({ label, value }) => (
-            <SelectItem key={value} value={value}>
+            <SelectItem key={value} value={value} className="cursor-pointer">
               {label}
             </SelectItem>
           ))

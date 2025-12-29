@@ -16,11 +16,18 @@ import {
 } from "@/components/ui/command";
 import { sidebarData } from "./layout/data/sidebar-data";
 import { ScrollArea } from "./ui/scroll-area";
+import { useAuth } from "@/hooks/use-auth";
 
 export function CommandMenu() {
   const router = useTransitionRouter();
   const { setTheme } = useTheme();
   const { open, setOpen } = useSearch();
+  const { authUser } = useAuth();
+  const isSuperAdmin =
+    authUser?.email === process.env.NEXT_PUBLIC_EMAIL_SUPER_ADMIN;
+  const navGroupsToShow = isSuperAdmin
+    ? sidebarData.navGroupsSuperAdmin
+    : sidebarData.navGroups;
 
   const runCommand = React.useCallback(
     (command: () => unknown) => {
@@ -32,11 +39,13 @@ export function CommandMenu() {
 
   return (
     <CommandDialog modal open={open} onOpenChange={setOpen}>
-      <CommandInput placeholder="Type a command or search..." />
+      <CommandInput placeholder="Escribe el nombre de un módulo (ej: ventas, productos)..." />
       <CommandList>
         <ScrollArea type="hover" className="h-72 pe-1">
-          <CommandEmpty>No results found.</CommandEmpty>
-          {sidebarData.navGroups.map((group) => (
+          <CommandEmpty>
+            No se encontraron resultados para tu búsqueda.
+          </CommandEmpty>
+          {navGroupsToShow.map((group) => (
             <CommandGroup key={group.title} heading={group.title}>
               {group.items.map((navItem, i) => {
                 if (navItem.url)
@@ -45,8 +54,9 @@ export function CommandMenu() {
                       key={`${navItem.url}-${i}`}
                       value={navItem.title}
                       onSelect={() => {
-                        runCommand(() => router.push(navItem.url));
+                        runCommand(() => router.push(String(navItem.url)));
                       }}
+                      className="cursor-pointer"
                     >
                       <div className="flex size-4 items-center justify-center">
                         <ArrowRight className="size-2 text-muted-foreground/80" />
@@ -60,8 +70,9 @@ export function CommandMenu() {
                     key={`${navItem.title}-${subItem.url}-${i}`}
                     value={`${navItem.title}-${subItem.url}`}
                     onSelect={() => {
-                      runCommand(() => router.push(subItem.url));
+                      runCommand(() => router.push(String(subItem.url)));
                     }}
+                    className="cursor-pointer"
                   >
                     <div className="flex size-4 items-center justify-center">
                       <ArrowRight className="size-2 text-muted-foreground/80" />
@@ -73,17 +84,26 @@ export function CommandMenu() {
             </CommandGroup>
           ))}
           <CommandSeparator />
-          <CommandGroup heading="Theme">
-            <CommandItem onSelect={() => runCommand(() => setTheme("light"))}>
-              <Sun /> <span>Light</span>
+          <CommandGroup heading="Tema">
+            <CommandItem
+              onSelect={() => runCommand(() => setTheme("light"))}
+              className="cursor-pointer"
+            >
+              <Sun /> <span>Claro</span>
             </CommandItem>
-            <CommandItem onSelect={() => runCommand(() => setTheme("dark"))}>
+            <CommandItem
+              onSelect={() => runCommand(() => setTheme("dark"))}
+              className="cursor-pointer"
+            >
               <Moon className="scale-90" />
-              <span>Dark</span>
+              <span>Oscuro</span>
             </CommandItem>
-            <CommandItem onSelect={() => runCommand(() => setTheme("system"))}>
+            <CommandItem
+              onSelect={() => runCommand(() => setTheme("system"))}
+              className="cursor-pointer"
+            >
               <Laptop />
-              <span>System</span>
+              <span>Sistema</span>
             </CommandItem>
           </CommandGroup>
         </ScrollArea>

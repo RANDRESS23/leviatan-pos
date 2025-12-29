@@ -4,6 +4,7 @@ import { useTransitionRouter } from "next-view-transitions";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
+import { useState } from "react";
 
 interface SignOutDialogProps {
   open: boolean;
@@ -11,11 +12,13 @@ interface SignOutDialogProps {
 }
 
 export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
+  const [isLoading, setIsLoading] = useState(false);
   const router = useTransitionRouter();
   const supabase = createClient();
 
   const handleSignOut = async () => {
     try {
+      setIsLoading(true);
       const { error } = await supabase.auth.signOut();
 
       if (error) {
@@ -27,6 +30,8 @@ export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
     } catch (error) {
       console.log({ error });
       toast.error("¡Error al cerrar sesión!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -34,10 +39,12 @@ export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
     <ConfirmDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Sign out"
-      desc="Are you sure you want to sign out? You will need to sign in again to access your account."
-      confirmText="Sign out"
+      title="Cerrar sesión"
+      desc="¿Estás seguro de que quieres cerrar sesión? Necesitarás iniciar sesión de nuevo para acceder a tu cuenta."
+      confirmText={isLoading ? "Cerrando sesión.." : "Cerrar sesión"}
+      cancelBtnText="Cancelar"
       destructive
+      disabled={isLoading}
       handleConfirm={handleSignOut}
       className="sm:max-w-sm"
     />

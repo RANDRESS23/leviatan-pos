@@ -48,7 +48,7 @@ export function ConfigDrawer() {
         <Button
           size="icon"
           variant="ghost"
-          aria-label="Open theme settings"
+          aria-label="Abrir configuración del tema"
           aria-describedby="config-drawer-description"
           className="rounded-full"
         >
@@ -57,9 +57,10 @@ export function ConfigDrawer() {
       </SheetTrigger>
       <SheetContent className="flex flex-col">
         <SheetHeader className="pb-0 text-start">
-          <SheetTitle>Theme Settings</SheetTitle>
+          <SheetTitle>Configuración del Tema</SheetTitle>
           <SheetDescription id="config-drawer-description">
-            Adjust the appearance and layout to suit your preferences.
+            Ajusta la apariencia y el diseño para que se adapten a tus
+            preferencias.
           </SheetDescription>
         </SheetHeader>
         <div className="space-y-6 overflow-y-auto px-4">
@@ -72,9 +73,9 @@ export function ConfigDrawer() {
           <Button
             variant="destructive"
             onClick={handleReset}
-            aria-label="Reset all settings to default values"
+            aria-label="Reiniciar todas las configuraciones a los valores predeterminados"
           >
-            Reset
+            Reiniciar
           </Button>
         </SheetFooter>
       </SheetContent>
