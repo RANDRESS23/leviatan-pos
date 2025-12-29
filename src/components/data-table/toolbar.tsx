@@ -30,7 +30,7 @@ export function DataTableToolbar<TData>({
     table.getState().columnFilters.length > 0 || table.getState().globalFilter;
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-y-2 md:gap-y-0">
       <div className="flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2">
         {searchKey ? (
           <Input
@@ -41,14 +41,14 @@ export function DataTableToolbar<TData>({
             onChange={(event) =>
               table.getColumn(searchKey)?.setFilterValue(event.target.value)
             }
-            className="h-8 w-[150px] lg:w-[270px]"
+            className="h-8 w-full md:w-[270px]"
           />
         ) : (
           <Input
             placeholder={searchPlaceholder}
             value={table.getState().globalFilter ?? ""}
             onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className="h-8 w-[150px] lg:w-[270px]"
+            className="h-8 w-full md:w-[270px]"
           />
         )}
         <div className="flex gap-x-2">
