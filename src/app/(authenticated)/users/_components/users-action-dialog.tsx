@@ -50,7 +50,7 @@ export const formSchema = z
     email: z.email("El correo electrónico no es válido"),
     telefono: z
       .string("El teléfono es requerido")
-      .min(1, "El teléfono es requerido"),
+      .min(8, "El teléfono debe tener al menos 8 caracteres"),
     activo: z.boolean(),
     rolId: z
       .string("El rol no puede estar vacío")
@@ -258,7 +258,7 @@ export function UsersActionDialog({
                 className="space-y-4 px-0.5"
               >
                 {isSuperAdmin && !isEdit && (
-                  <div className="flex justify-between items-center gap-x-3">
+                  <div className="flex justify-between items-start gap-x-3">
                     <FormField
                       control={form.control}
                       name="empresaId"
@@ -287,7 +287,7 @@ export function UsersActionDialog({
                   </div>
                 )}
 
-                <div className="flex justify-between items-center gap-x-3">
+                <div className="flex justify-between items-start gap-x-3">
                   <FormField
                     control={form.control}
                     name="primer_nombre"
@@ -336,7 +336,7 @@ export function UsersActionDialog({
                   />
                 </div>
 
-                <div className="flex justify-between items-center gap-x-3">
+                <div className="flex justify-between items-start gap-x-3">
                   <FormField
                     control={form.control}
                     name="primer_apellido"
@@ -385,7 +385,7 @@ export function UsersActionDialog({
                   />
                 </div>
 
-                <div className="flex justify-between items-center gap-x-3">
+                <div className="flex justify-between items-start gap-x-3">
                   <FormField
                     control={form.control}
                     name="email"
@@ -468,7 +468,7 @@ export function UsersActionDialog({
                   />
                 )}
 
-                <div className="flex justify-between items-center gap-x-3">
+                <div className="flex justify-between items-start gap-x-3">
                   <FormField
                     control={form.control}
                     name="password"

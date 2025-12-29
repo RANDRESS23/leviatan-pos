@@ -178,9 +178,9 @@ export const createUser = async (data: UserForm, isSuperAdmin: boolean) => {
         empresaId: data.empresaId,
         rolId: isSuperAdmin ? rolCeoId : data.rolId,
         primer_nombre: data.primer_nombre,
-        segundo_nombre: data.segundo_nombre,
+        segundo_nombre: data.segundo_nombre || null,
         primer_apellido: data.primer_apellido,
-        segundo_apellido: data.segundo_apellido,
+        segundo_apellido: data.segundo_apellido || null,
         email: data.email,
         telefono: data.telefono,
         password: hashedPassword
