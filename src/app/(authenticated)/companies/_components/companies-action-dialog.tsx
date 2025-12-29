@@ -110,12 +110,13 @@ export function CompaniesActionDialog({
       } else {
         company = await createCompany(values);
       }
-      form.reset();
-      onOpenChange(false);
 
       if (company.statusCode === 201 || company.statusCode === 200) {
         toast.success(company.message);
         onShoot();
+
+        form.reset();
+        onOpenChange(false);
       } else toast.error(company.message);
     } catch (error) {
       console.log(error);
@@ -282,7 +283,13 @@ export function CompaniesActionDialog({
               className="disabled:cursor-not-allowed"
             >
               {isLoading ? <Loader2 className="animate-spin" /> : <Save />}
-              {isEdit ? "Actualizar empresa" : "Guardar empresa"}
+              {isEdit
+                ? isLoading
+                  ? "Actualizando empresa..."
+                  : "Actualizar empresa"
+                : isLoading
+                  ? "Guardando empresa..."
+                  : "Guardar empresa"}
             </Button>
           </DialogFooter>
         </DialogContent>
