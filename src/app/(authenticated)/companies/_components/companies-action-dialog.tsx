@@ -27,8 +27,6 @@ import { createCompany, updateCompany } from "../_actions/company";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Loader2, Save } from "lucide-react";
-import { useConfetti } from "@/hooks/use-confetti";
-import Realistic from "react-canvas-confetti/dist/presets/realistic";
 
 export const formSchema = z.object({
   id: z.string().optional(),
@@ -55,15 +53,16 @@ type CompanyActionDialogProps = {
   currentRow?: Company;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onShoot: () => void;
 };
 
 export function CompaniesActionDialog({
   currentRow,
   open,
   onOpenChange,
+  onShoot,
 }: CompanyActionDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const { onInitHandler, onShoot } = useConfetti();
 
   const isEdit = !!currentRow;
   const form = useForm<CompanyForm>({
@@ -132,114 +131,132 @@ export function CompaniesActionDialog({
   };
 
   return (
-    <>
-      <Dialog
-        open={open}
-        onOpenChange={(state) => {
-          form.reset();
-          onOpenChange(state);
-        }}
-      >
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader className="text-start">
-            <DialogTitle>
-              {isEdit ? "Editar empresa" : "Registrar nueva empresa"}
-            </DialogTitle>
-            <DialogDescription>
-              {isEdit
-                ? "Edita la empresa aquí. "
-                : "Registra una nueva empresa aquí. "}
-              Haga clic en{" "}
-              {isEdit ? "'Actualizar empresa'" : "'Guardar empresa'"} cuando
-              haya terminado.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="max-h-105 w-[calc(100%+0.75rem)] overflow-y-auto py-1 pe-3">
-            <Form {...form}>
-              <form
-                id="company-form"
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4 px-0.5"
-              >
+    <Dialog
+      open={open}
+      onOpenChange={(state) => {
+        form.reset();
+        onOpenChange(state);
+      }}
+    >
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader className="text-start">
+          <DialogTitle>
+            {isEdit ? "Editar empresa" : "Registrar nueva empresa"}
+          </DialogTitle>
+          <DialogDescription>
+            {isEdit
+              ? "Edita la empresa aquí. "
+              : "Registra una nueva empresa aquí. "}
+            Haga clic en {isEdit ? "'Actualizar empresa'" : "'Guardar empresa'"}{" "}
+            cuando haya terminado.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="max-h-105 w-[calc(100%+0.75rem)] overflow-y-auto py-1 pe-3">
+          <Form {...form}>
+            <form
+              id="company-form"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 px-0.5"
+            >
+              <FormField
+                control={form.control}
+                name="nombre"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
+                    <FormLabel className="col-span-2 text-end">
+                      Nombre
+                      <span className="text-destructive font-bold -ml-1.5 text-md">
+                        *
+                      </span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="John"
+                        className="col-span-4"
+                        autoComplete="off"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-4 col-start-3" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="emailContacto"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
+                    <FormLabel className="col-span-2 text-end">
+                      Correo electrónico
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="john.doe@gmail.com"
+                        className="col-span-4"
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        name={field.name}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-4 col-start-3" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="telefono"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
+                    <FormLabel className="col-span-2 text-end">
+                      Teléfono
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="+123456789"
+                        className="col-span-4"
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        name={field.name}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-4 col-start-3" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="moduloRestaurante"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
+                    <FormLabel className="col-span-2 text-end">
+                      Módulo restaurante
+                      <span className="text-destructive font-bold -ml-1.5 text-md">
+                        *
+                      </span>
+                    </FormLabel>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-4 col-start-3" />
+                  </FormItem>
+                )}
+              />
+
+              {isEdit && (
                 <FormField
                   control={form.control}
-                  name="nombre"
+                  name="estado"
                   render={({ field }) => (
                     <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
                       <FormLabel className="col-span-2 text-end">
-                        Nombre
-                        <span className="text-destructive font-bold -ml-1.5 text-md">
-                          *
-                        </span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="John"
-                          className="col-span-4"
-                          autoComplete="off"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="col-span-4 col-start-3" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="emailContacto"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
-                      <FormLabel className="col-span-2 text-end">
-                        Correo electrónico
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="john.doe@gmail.com"
-                          className="col-span-4"
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          name={field.name}
-                          ref={field.ref}
-                        />
-                      </FormControl>
-                      <FormMessage className="col-span-4 col-start-3" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="telefono"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
-                      <FormLabel className="col-span-2 text-end">
-                        Teléfono
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="+123456789"
-                          className="col-span-4"
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          name={field.name}
-                          ref={field.ref}
-                        />
-                      </FormControl>
-                      <FormMessage className="col-span-4 col-start-3" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="moduloRestaurante"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
-                      <FormLabel className="col-span-2 text-end">
-                        Módulo restaurante
-                        <span className="text-destructive font-bold -ml-1.5 text-md">
-                          *
-                        </span>
+                        Estado restaurante
                       </FormLabel>
                       <FormControl>
                         <Switch
@@ -251,50 +268,28 @@ export function CompaniesActionDialog({
                     </FormItem>
                   )}
                 />
-
-                {isEdit && (
-                  <FormField
-                    control={form.control}
-                    name="estado"
-                    render={({ field }) => (
-                      <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
-                        <FormLabel className="col-span-2 text-end">
-                          Estado restaurante
-                        </FormLabel>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormMessage className="col-span-4 col-start-3" />
-                      </FormItem>
-                    )}
-                  />
-                )}
-              </form>
-            </Form>
-          </div>
-          <DialogFooter>
-            <Button
-              type="submit"
-              form="company-form"
-              disabled={isLoading}
-              className="disabled:cursor-not-allowed"
-            >
-              {isLoading ? <Loader2 className="animate-spin" /> : <Save />}
-              {isEdit
-                ? isLoading
-                  ? "Actualizando empresa..."
-                  : "Actualizar empresa"
-                : isLoading
-                  ? "Guardando empresa..."
-                  : "Guardar empresa"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <Realistic onInit={onInitHandler} />
-    </>
+              )}
+            </form>
+          </Form>
+        </div>
+        <DialogFooter>
+          <Button
+            type="submit"
+            form="company-form"
+            disabled={isLoading}
+            className="disabled:cursor-not-allowed"
+          >
+            {isLoading ? <Loader2 className="animate-spin" /> : <Save />}
+            {isEdit
+              ? isLoading
+                ? "Actualizando empresa..."
+                : "Actualizar empresa"
+              : isLoading
+                ? "Guardando empresa..."
+                : "Guardar empresa"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

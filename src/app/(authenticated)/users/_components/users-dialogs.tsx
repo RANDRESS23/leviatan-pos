@@ -2,6 +2,8 @@
 
 import { UsersActionDialog } from "./users-action-dialog";
 import { useUsers } from "./users-provider";
+import { useConfetti } from "@/hooks/use-confetti";
+import Realistic from "react-canvas-confetti/dist/presets/realistic";
 
 type UsersDialogsProps = {
   empresas: { id: string; nombre: string }[];
@@ -15,6 +17,8 @@ export function UsersDialogs({
   isSuperAdmin,
 }: UsersDialogsProps) {
   const { open, setOpen, currentRow, setCurrentRow } = useUsers();
+  const { onInitHandler, onShoot } = useConfetti();
+
   return (
     <>
       <UsersActionDialog
@@ -24,6 +28,7 @@ export function UsersDialogs({
         empresas={empresas}
         roles={roles}
         isSuperAdmin={isSuperAdmin}
+        onShoot={onShoot}
       />
 
       {currentRow && (
@@ -41,9 +46,22 @@ export function UsersDialogs({
             empresas={empresas}
             roles={roles}
             isSuperAdmin={isSuperAdmin}
+            onShoot={onShoot}
           />
         </>
       )}
+      <Realistic
+        onInit={onInitHandler}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          zIndex: 9999,
+        }}
+      />
     </>
   );
 }

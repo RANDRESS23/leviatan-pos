@@ -3,6 +3,8 @@
 import { Permission } from "../_data/schema";
 import { RolesAndPermissionsActionDialog } from "./roles-and-permissions-action-dialog";
 import { useRolesAndPermissions } from "./roles-and-permissions-provider";
+import { useConfetti } from "@/hooks/use-confetti";
+import Realistic from "react-canvas-confetti/dist/presets/realistic";
 
 export function RolesAndPermissionsDialogs({
   permisos,
@@ -10,6 +12,8 @@ export function RolesAndPermissionsDialogs({
   permisos: Permission[];
 }) {
   const { open, setOpen, currentRow, setCurrentRow } = useRolesAndPermissions();
+  const { onInitHandler, onShoot } = useConfetti();
+
   return (
     <>
       <RolesAndPermissionsActionDialog
@@ -17,6 +21,7 @@ export function RolesAndPermissionsDialogs({
         open={open === "add"}
         onOpenChange={() => setOpen("add")}
         permisos={permisos}
+        onShoot={onShoot}
       />
 
       {currentRow && (
@@ -32,9 +37,22 @@ export function RolesAndPermissionsDialogs({
             }}
             currentRow={currentRow}
             permisos={permisos}
+            onShoot={onShoot}
           />
         </>
       )}
+      <Realistic
+        onInit={onInitHandler}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          zIndex: 9999,
+        }}
+      />
     </>
   );
 }

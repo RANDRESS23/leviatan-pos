@@ -30,8 +30,6 @@ import { Loader2, Save } from "lucide-react";
 import { PasswordInput } from "@/components/password-input";
 import { SelectDropdown } from "@/components/select-dropdown";
 import { useAuth } from "@/hooks/use-auth";
-import { useConfetti } from "@/hooks/use-confetti";
-import Realistic from "react-canvas-confetti/dist/presets/realistic";
 
 export const formSchema = z
   .object({
@@ -118,6 +116,7 @@ type UserActionDialogProps = {
   empresas: { id: string; nombre: string }[];
   roles: { id: string; nombre: string }[];
   isSuperAdmin: boolean;
+  onShoot: () => void;
 };
 
 export function UsersActionDialog({
@@ -127,10 +126,10 @@ export function UsersActionDialog({
   empresas,
   roles,
   isSuperAdmin,
+  onShoot,
 }: UserActionDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
-  const { onInitHandler, onShoot } = useConfetti();
   const rolesFilter = roles.filter((rol) => rol.nombre !== "CEO");
 
   const isEdit = !!currentRow;
@@ -224,230 +223,47 @@ export function UsersActionDialog({
   const isPasswordTouched = !!form.formState.dirtyFields.password;
 
   return (
-    <>
-      <Dialog
-        open={open}
-        onOpenChange={(state) => {
-          form.reset();
-          onOpenChange(state);
-        }}
-      >
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader className="text-start">
-            <DialogTitle>
-              {isEdit
-                ? `Editar ${isSuperAdmin ? "CEO" : "usuario"}`
-                : `Registrar nuevo ${isSuperAdmin ? "CEO" : "usuario"}`}
-            </DialogTitle>
-            <DialogDescription>
-              {isEdit
-                ? `Edita el ${isSuperAdmin ? "CEO" : "usuario"} aquí. `
-                : `Registra un nuevo ${isSuperAdmin ? "CEO" : "usuario"} aquí. `}
-              Haga clic en{" "}
-              {isEdit
-                ? `'Actualizar ${isSuperAdmin ? "CEO" : "usuario"}'`
-                : `'Guardar ${isSuperAdmin ? "CEO" : "usuario"}'`}{" "}
-              cuando haya terminado.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="max-h-105 w-[calc(100%+0.75rem)] overflow-y-auto py-1 pe-3">
-            <Form {...form}>
-              <form
-                id="user-form"
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4 px-0.5"
-              >
-                {isSuperAdmin && !isEdit && (
-                  <div className="flex justify-between items-start gap-x-3">
-                    <FormField
-                      control={form.control}
-                      name="empresaId"
-                      render={({ field }) => (
-                        <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
-                          <FormLabel className="text-start">
-                            Empresa
-                            <span className="text-destructive font-bold -ml-1.5 text-md">
-                              *
-                            </span>
-                          </FormLabel>
-                          <SelectDropdown
-                            defaultValue={field.value}
-                            onValueChange={field.onChange}
-                            placeholder="Selecciona una empresa"
-                            className="w-full"
-                            items={empresas.map(({ nombre, id }) => ({
-                              label: nombre,
-                              value: id,
-                            }))}
-                          />
-                          <FormMessage className="w-full" />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
-
+    <Dialog
+      open={open}
+      onOpenChange={(state) => {
+        form.reset();
+        onOpenChange(state);
+      }}
+    >
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader className="text-start">
+          <DialogTitle>
+            {isEdit
+              ? `Editar ${isSuperAdmin ? "CEO" : "usuario"}`
+              : `Registrar nuevo ${isSuperAdmin ? "CEO" : "usuario"}`}
+          </DialogTitle>
+          <DialogDescription>
+            {isEdit
+              ? `Edita el ${isSuperAdmin ? "CEO" : "usuario"} aquí. `
+              : `Registra un nuevo ${isSuperAdmin ? "CEO" : "usuario"} aquí. `}
+            Haga clic en{" "}
+            {isEdit
+              ? `'Actualizar ${isSuperAdmin ? "CEO" : "usuario"}'`
+              : `'Guardar ${isSuperAdmin ? "CEO" : "usuario"}'`}{" "}
+            cuando haya terminado.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="max-h-105 w-[calc(100%+0.75rem)] overflow-y-auto py-1 pe-3">
+          <Form {...form}>
+            <form
+              id="user-form"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 px-0.5"
+            >
+              {isSuperAdmin && !isEdit && (
                 <div className="flex justify-between items-start gap-x-3">
                   <FormField
                     control={form.control}
-                    name="primer_nombre"
+                    name="empresaId"
                     render={({ field }) => (
                       <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
                         <FormLabel className="text-start">
-                          Primer nombre
-                          <span className="text-destructive font-bold -ml-1.5 text-md">
-                            *
-                          </span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="John"
-                            className=""
-                            autoComplete="off"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="" />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="segundo_nombre"
-                    render={({ field }) => (
-                      <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
-                        <FormLabel className="text-start">
-                          Segundo nombre
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="John"
-                            className=""
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            name={field.name}
-                            ref={field.ref}
-                          />
-                        </FormControl>
-                        <FormMessage className="" />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="flex justify-between items-start gap-x-3">
-                  <FormField
-                    control={form.control}
-                    name="primer_apellido"
-                    render={({ field }) => (
-                      <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
-                        <FormLabel className="text-start">
-                          Primer apellido
-                          <span className="text-destructive font-bold -ml-1.5 text-md">
-                            *
-                          </span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Doe"
-                            className=""
-                            autoComplete="off"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="" />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="segundo_apellido"
-                    render={({ field }) => (
-                      <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
-                        <FormLabel className="text-start">
-                          Segundo apellido
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Doe"
-                            className=""
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            name={field.name}
-                            ref={field.ref}
-                          />
-                        </FormControl>
-                        <FormMessage className="" />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="flex justify-between items-start gap-x-3">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
-                        <FormLabel className="text-start">
-                          Correo electrónico
-                          <span className="text-destructive font-bold -ml-1.5 text-md">
-                            *
-                          </span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="john.doe@gmail.com"
-                            className=""
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            name={field.name}
-                            ref={field.ref}
-                          />
-                        </FormControl>
-                        <FormMessage className="" />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="telefono"
-                    render={({ field }) => (
-                      <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
-                        <FormLabel className="text-start">
-                          Teléfono
-                          <span className="text-destructive font-bold -ml-1.5 text-md">
-                            *
-                          </span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="+123456789"
-                            className=""
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            name={field.name}
-                            ref={field.ref}
-                          />
-                        </FormControl>
-                        <FormMessage className="" />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {!isSuperAdmin && (
-                  <FormField
-                    control={form.control}
-                    name="rolId"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col items-start space-y-0 gap-x-4 gap-y-1">
-                        <FormLabel className="text-end">
-                          Rol{" "}
+                          Empresa
                           <span className="text-destructive font-bold -ml-1.5 text-md">
                             *
                           </span>
@@ -455,108 +271,288 @@ export function UsersActionDialog({
                         <SelectDropdown
                           defaultValue={field.value}
                           onValueChange={field.onChange}
-                          placeholder="Selecciona un rol"
+                          placeholder="Selecciona una empresa"
                           className="w-full"
-                          items={rolesFilter.map(({ nombre, id }) => ({
+                          items={empresas.map(({ nombre, id }) => ({
                             label: nombre,
                             value: id,
                           }))}
                         />
-                        <FormMessage className="" />
-                      </FormItem>
-                    )}
-                  />
-                )}
-
-                <div className="flex justify-between items-start gap-x-3">
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
-                        <FormLabel className="text-start">
-                          Contraseña
-                          <span className="text-destructive font-bold -ml-1.5 text-md">
-                            *
-                          </span>
-                        </FormLabel>
-                        <FormControl>
-                          <PasswordInput
-                            placeholder="e.g., S3cur3P@ssw0rd"
-                            className=""
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="" />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
-                        <FormLabel className="text-start">
-                          Confirmar contraseña
-                          <span className="text-destructive font-bold -ml-1.5 text-md">
-                            *
-                          </span>
-                        </FormLabel>
-                        <FormControl>
-                          <PasswordInput
-                            disabled={!isPasswordTouched}
-                            placeholder="e.g., S3cur3P@ssw0rd"
-                            className=""
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="" />
+                        <FormMessage className="w-full" />
                       </FormItem>
                     )}
                   />
                 </div>
+              )}
 
-                {isEdit && (
-                  <FormField
-                    control={form.control}
-                    name="activo"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center space-y-0 gap-x-4 gap-y-1">
-                        <FormLabel className="">Estado usuario</FormLabel>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormMessage className="col-span-4 col-start-3" />
-                      </FormItem>
-                    )}
-                  />
-                )}
-              </form>
-            </Form>
-          </div>
-          <DialogFooter>
-            <Button
-              type="submit"
-              form="user-form"
-              disabled={isLoading}
-              className="disabled:cursor-not-allowed"
-            >
-              {isLoading ? <Loader2 className="animate-spin" /> : <Save />}
-              {isEdit
-                ? isLoading
-                  ? `Actualizando ${isSuperAdmin ? "CEO..." : "usuario..."}`
-                  : `Actualizar ${isSuperAdmin ? "CEO" : "usuario"}`
-                : isLoading
-                  ? `Guardando ${isSuperAdmin ? "CEO..." : "usuario..."}`
-                  : `Guardar ${isSuperAdmin ? "CEO" : "usuario"}`}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <Realistic onInit={onInitHandler} />
-    </>
+              <div className="flex justify-between items-start gap-x-3">
+                <FormField
+                  control={form.control}
+                  name="primer_nombre"
+                  render={({ field }) => (
+                    <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
+                      <FormLabel className="text-start">
+                        Primer nombre
+                        <span className="text-destructive font-bold -ml-1.5 text-md">
+                          *
+                        </span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="John"
+                          className=""
+                          autoComplete="off"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="segundo_nombre"
+                  render={({ field }) => (
+                    <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
+                      <FormLabel className="text-start">
+                        Segundo nombre
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="John"
+                          className=""
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormMessage className="" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="flex justify-between items-start gap-x-3">
+                <FormField
+                  control={form.control}
+                  name="primer_apellido"
+                  render={({ field }) => (
+                    <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
+                      <FormLabel className="text-start">
+                        Primer apellido
+                        <span className="text-destructive font-bold -ml-1.5 text-md">
+                          *
+                        </span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Doe"
+                          className=""
+                          autoComplete="off"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="segundo_apellido"
+                  render={({ field }) => (
+                    <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
+                      <FormLabel className="text-start">
+                        Segundo apellido
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Doe"
+                          className=""
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormMessage className="" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="flex justify-between items-start gap-x-3">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
+                      <FormLabel className="text-start">
+                        Correo electrónico
+                        <span className="text-destructive font-bold -ml-1.5 text-md">
+                          *
+                        </span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="john.doe@gmail.com"
+                          className=""
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormMessage className="" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="telefono"
+                  render={({ field }) => (
+                    <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
+                      <FormLabel className="text-start">
+                        Teléfono
+                        <span className="text-destructive font-bold -ml-1.5 text-md">
+                          *
+                        </span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="+123456789"
+                          className=""
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormMessage className="" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {!isSuperAdmin && (
+                <FormField
+                  control={form.control}
+                  name="rolId"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col items-start space-y-0 gap-x-4 gap-y-1">
+                      <FormLabel className="text-end">
+                        Rol{" "}
+                        <span className="text-destructive font-bold -ml-1.5 text-md">
+                          *
+                        </span>
+                      </FormLabel>
+                      <SelectDropdown
+                        defaultValue={field.value}
+                        onValueChange={field.onChange}
+                        placeholder="Selecciona un rol"
+                        className="w-full"
+                        items={rolesFilter.map(({ nombre, id }) => ({
+                          label: nombre,
+                          value: id,
+                        }))}
+                      />
+                      <FormMessage className="" />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              <div className="flex justify-between items-start gap-x-3">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
+                      <FormLabel className="text-start">
+                        Contraseña
+                        <span className="text-destructive font-bold -ml-1.5 text-md">
+                          *
+                        </span>
+                      </FormLabel>
+                      <FormControl>
+                        <PasswordInput
+                          placeholder="e.g., S3cur3P@ssw0rd"
+                          className=""
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
+                      <FormLabel className="text-start">
+                        Confirmar contraseña
+                        <span className="text-destructive font-bold -ml-1.5 text-md">
+                          *
+                        </span>
+                      </FormLabel>
+                      <FormControl>
+                        <PasswordInput
+                          disabled={!isPasswordTouched}
+                          placeholder="e.g., S3cur3P@ssw0rd"
+                          className=""
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {isEdit && (
+                <FormField
+                  control={form.control}
+                  name="activo"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-y-0 gap-x-4 gap-y-1">
+                      <FormLabel className="">Estado usuario</FormLabel>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage className="col-span-4 col-start-3" />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </form>
+          </Form>
+        </div>
+        <DialogFooter>
+          <Button
+            type="submit"
+            form="user-form"
+            disabled={isLoading}
+            className="disabled:cursor-not-allowed"
+          >
+            {isLoading ? <Loader2 className="animate-spin" /> : <Save />}
+            {isEdit
+              ? isLoading
+                ? `Actualizando ${isSuperAdmin ? "CEO..." : "usuario..."}`
+                : `Actualizar ${isSuperAdmin ? "CEO" : "usuario"}`
+              : isLoading
+                ? `Guardando ${isSuperAdmin ? "CEO..." : "usuario..."}`
+                : `Guardar ${isSuperAdmin ? "CEO" : "usuario"}`}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

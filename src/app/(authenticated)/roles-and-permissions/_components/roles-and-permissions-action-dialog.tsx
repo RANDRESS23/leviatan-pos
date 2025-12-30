@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Permission, type Role } from "../_data/schema";
-import { Switch } from "@/components/ui/switch";
 import { createRole, updateRole } from "../_actions/rolesAndPermissions";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -31,8 +30,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useConfetti } from "@/hooks/use-confetti";
-import Realistic from "react-canvas-confetti/dist/presets/realistic";
 
 export const formSchema = z.object({
   id: z.string().optional(),
@@ -53,6 +50,7 @@ type RoleActionDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   permisos: Permission[];
+  onShoot: () => void;
 };
 
 export function RolesAndPermissionsActionDialog({
@@ -60,10 +58,10 @@ export function RolesAndPermissionsActionDialog({
   open,
   onOpenChange,
   permisos,
+  onShoot,
 }: RoleActionDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
-  const { onInitHandler, onShoot } = useConfetti();
   const isEdit = !!currentRow;
 
   const form = useForm<RoleForm>({
@@ -135,157 +133,151 @@ export function RolesAndPermissionsActionDialog({
   };
 
   return (
-    <>
-      <Dialog
-        open={open}
-        onOpenChange={(state) => {
-          form.reset();
-          onOpenChange(state);
-        }}
-      >
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader className="text-start">
-            <DialogTitle>
-              {isEdit ? "Editar rol" : "Registrar nuevo rol"}
-            </DialogTitle>
-            <DialogDescription>
-              {isEdit ? "Edita el rol aquí. " : "Registra un nuevo rol aquí. "}
-              Haga clic en {isEdit ? "'Actualizar rol'" : "'Guardar rol'"}{" "}
-              cuando haya terminado.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="max-h-105 w-[calc(100%+0.75rem)] overflow-y-auto py-1 pe-3">
-            <Form {...form}>
-              <form
-                id="role-form"
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4 px-0.5"
-              >
-                <FormField
-                  control={form.control}
-                  name="nombre"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
-                      <FormLabel className="col-span-2 text-end">
-                        Nombre
-                        <span className="text-destructive font-bold -ml-1.5 text-md">
-                          *
-                        </span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Ej: Cajero"
-                          className="col-span-4"
-                          autoComplete="off"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="col-span-4 col-start-3" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="descripcion"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
-                      <FormLabel className="col-span-2 text-end">
-                        Descripción
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Digite la descripción del rol aquí"
-                          className="col-span-4 resize-none"
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          name={field.name}
-                          ref={field.ref}
-                        />
-                      </FormControl>
-                      <FormMessage className="col-span-4 col-start-3" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="permisos"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col items-start space-y-0 gap-x-4 gap-y-3">
-                      <FormLabel className="pt-2">
-                        Permisos
-                        <span className="text-destructive font-bold -ml-1.5 text-md">
-                          *
-                        </span>
-                      </FormLabel>
-                      <FormControl className="">
-                        <div className="grid grid-cols-2 gap-x-2 space-y-4">
-                          {permisos.map((permiso) => (
-                            <div
-                              key={permiso.id}
-                              className="flex items-start space-x-2"
-                            >
-                              <Checkbox
-                                id={permiso.id}
-                                checked={field.value?.includes(permiso.id)}
-                                onCheckedChange={(checked) => {
-                                  const currentValue = field.value || [];
-                                  if (checked) {
-                                    field.onChange([
-                                      ...currentValue,
-                                      permiso.id,
-                                    ]);
-                                  } else {
-                                    field.onChange(
-                                      currentValue.filter(
-                                        (id: string) => id !== permiso.id
-                                      )
-                                    );
-                                  }
-                                }}
-                              />
-                              <div className="flex flex-col">
-                                <Label
-                                  htmlFor={permiso.id}
-                                  className="text-sm font-normal cursor-pointer"
-                                >
-                                  {permiso.codigo}
-                                </Label>
-                                <p className="text-muted-foreground text-xs">
-                                  {permiso.descripcion}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </FormControl>
-                      <FormMessage className="" />
-                    </FormItem>
-                  )}
-                />
-              </form>
-            </Form>
-          </div>
-          <DialogFooter>
-            <Button
-              type="submit"
-              form="role-form"
-              disabled={isLoading}
-              className="disabled:cursor-not-allowed"
+    <Dialog
+      open={open}
+      onOpenChange={(state) => {
+        form.reset();
+        onOpenChange(state);
+      }}
+    >
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader className="text-start">
+          <DialogTitle>
+            {isEdit ? "Editar rol" : "Registrar nuevo rol"}
+          </DialogTitle>
+          <DialogDescription>
+            {isEdit ? "Edita el rol aquí. " : "Registra un nuevo rol aquí. "}
+            Haga clic en {isEdit ? "'Actualizar rol'" : "'Guardar rol'"} cuando
+            haya terminado.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="max-h-105 w-[calc(100%+0.75rem)] overflow-y-auto py-1 pe-3">
+          <Form {...form}>
+            <form
+              id="role-form"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 px-0.5"
             >
-              {isLoading ? <Loader2 className="animate-spin" /> : <Save />}
-              {isEdit
-                ? isLoading
-                  ? "Actualizando rol..."
-                  : "Actualizar rol"
-                : isLoading
-                  ? "Guardando rol..."
-                  : "Guardar rol"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <Realistic onInit={onInitHandler} />
-    </>
+              <FormField
+                control={form.control}
+                name="nombre"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
+                    <FormLabel className="col-span-2 text-end">
+                      Nombre
+                      <span className="text-destructive font-bold -ml-1.5 text-md">
+                        *
+                      </span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Ej: Cajero"
+                        className="col-span-4"
+                        autoComplete="off"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-4 col-start-3" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="descripcion"
+                render={({ field }) => (
+                  <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
+                    <FormLabel className="col-span-2 text-end">
+                      Descripción
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Digite la descripción del rol aquí"
+                        className="col-span-4 resize-none"
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        name={field.name}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                    <FormMessage className="col-span-4 col-start-3" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="permisos"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col items-start space-y-0 gap-x-4 gap-y-3">
+                    <FormLabel className="pt-2">
+                      Permisos
+                      <span className="text-destructive font-bold -ml-1.5 text-md">
+                        *
+                      </span>
+                    </FormLabel>
+                    <FormControl className="">
+                      <div className="grid grid-cols-2 gap-x-2 space-y-4">
+                        {permisos.map((permiso) => (
+                          <div
+                            key={permiso.id}
+                            className="flex items-start space-x-2"
+                          >
+                            <Checkbox
+                              id={permiso.id}
+                              checked={field.value?.includes(permiso.id)}
+                              onCheckedChange={(checked) => {
+                                const currentValue = field.value || [];
+                                if (checked) {
+                                  field.onChange([...currentValue, permiso.id]);
+                                } else {
+                                  field.onChange(
+                                    currentValue.filter(
+                                      (id: string) => id !== permiso.id
+                                    )
+                                  );
+                                }
+                              }}
+                            />
+                            <div className="flex flex-col">
+                              <Label
+                                htmlFor={permiso.id}
+                                className="text-sm font-normal cursor-pointer"
+                              >
+                                {permiso.codigo}
+                              </Label>
+                              <p className="text-muted-foreground text-xs">
+                                {permiso.descripcion}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </FormControl>
+                    <FormMessage className="" />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </div>
+        <DialogFooter>
+          <Button
+            type="submit"
+            form="role-form"
+            disabled={isLoading}
+            className="disabled:cursor-not-allowed"
+          >
+            {isLoading ? <Loader2 className="animate-spin" /> : <Save />}
+            {isEdit
+              ? isLoading
+                ? "Actualizando rol..."
+                : "Actualizar rol"
+              : isLoading
+                ? "Guardando rol..."
+                : "Guardar rol"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
