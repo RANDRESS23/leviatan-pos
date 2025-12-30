@@ -351,25 +351,55 @@ export const importClients = async (idUserLogged: string, clients: ImportedClien
         continue
       }
 
-      // Validar estado
       if (!['ACTIVO', 'INACTIVO'].includes(clienteExcel.estado.toUpperCase())) {
         erroresValidacion.push(`Fila ${i + 2}: El estado debe ser "ACTIVO" o "INACTIVO"`)
         continue
       }
 
-      // Verificar si el cliente ya existe
       const clienteExistente = mapaClientesActuales.get(numeroDoc)
       
       if (clienteExistente) {
-        // Cliente existe - se actualizará
         clientesActualizar.push({ excel: clienteExcel, actual: clienteExistente })
       } else {
-        // Cliente nuevo - se agregará
         clientesNuevos.push(clienteExcel)
       }
     }
 
-    // Si hay errores de validación, retornarlos
+    // Validar duplicados dentro del Excel
+    const numerosDocumentoExcel = clients.map(c => c.numero_documento.toLowerCase().trim())
+    const duplicadosExcel = new Set<string>()
+    
+    for (let i = 0; i < numerosDocumentoExcel.length; i++) {
+      const numDoc = numerosDocumentoExcel[i]
+      if (numerosDocumentoExcel.indexOf(numDoc) !== i) {
+        duplicadosExcel.add(numDoc)
+      }
+    }
+
+    if (duplicadosExcel.size > 0) {
+      const duplicadosConFilas: string[] = []
+      duplicadosExcel.forEach(numDoc => {
+        const filas: number[] = []
+        numerosDocumentoExcel.forEach((doc, index) => {
+          if (doc === numDoc) {
+            filas.push(index + 2) // +2 porque: +1 para fila humana (no 0-indexed) y +1 porque headers están en fila 1
+          }
+        })
+        duplicadosConFilas.push(`• Documento "${numDoc}" repetido en filas: ${filas.join(', ')}`)
+      })
+      
+      return {
+        clientes: [],
+        statusCode: 400,
+        status: "error",
+        message: "Errores de validación en el archivo Excel:\n\n" + 
+                 "❌ Clientes duplicados en el Excel:\n" + 
+                 duplicadosConFilas.join('\n') + 
+                 "\n\n💡 Cada cliente debe aparecer una sola vez en el archivo Excel."
+      }
+    }
+
+    // Validar errores de validación antes de continuar
     if (erroresValidacion.length > 0) {
       return {
         clientes: [],
