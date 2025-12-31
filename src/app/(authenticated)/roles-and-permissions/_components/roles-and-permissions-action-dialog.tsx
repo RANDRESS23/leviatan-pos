@@ -158,52 +158,52 @@ export function RolesAndPermissionsActionDialog({
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-4 px-0.5"
             >
-              <FormField
-                control={form.control}
-                name="nombre"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
-                    <FormLabel className="col-span-2 text-end">
-                      Nombre
-                      <span className="text-destructive font-bold -ml-1.5 text-md">
-                        *
-                      </span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Ej: Cajero"
-                        className="col-span-4"
-                        autoComplete="off"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className="col-span-4 col-start-3" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="descripcion"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
-                    <FormLabel className="col-span-2 text-end">
-                      Descripción
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Digite la descripción del rol aquí"
-                        className="col-span-4 resize-none"
-                        value={field.value || ""}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                        name={field.name}
-                        ref={field.ref}
-                      />
-                    </FormControl>
-                    <FormMessage className="col-span-4 col-start-3" />
-                  </FormItem>
-                )}
-              />
+              <div className="flex flex-col justify-between items-start gap-3">
+                <FormField
+                  control={form.control}
+                  name="nombre"
+                  render={({ field }) => (
+                    <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
+                      <FormLabel className="text-start">
+                        Nombre
+                        <span className="text-destructive font-bold -ml-1.5 text-md">
+                          *
+                        </span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Ej: Cajero"
+                          className=""
+                          autoComplete="off"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="descripcion"
+                  render={({ field }) => (
+                    <FormItem className="w-full flex flex-col space-y-0 gap-x-4 gap-y-2">
+                      <FormLabel className="text-start">Descripción</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Digite la descripción del rol aquí"
+                          className="resize-none"
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormMessage className="" />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <FormField
                 control={form.control}
                 name="permisos"

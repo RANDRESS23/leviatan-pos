@@ -256,7 +256,7 @@ export function UsersActionDialog({
               className="space-y-4 px-0.5"
             >
               {isSuperAdmin && !isEdit && (
-                <div className="flex justify-between items-start gap-x-3">
+                <div className="flex flex-col md:flex-row justify-between items-start gap-3">
                   <FormField
                     control={form.control}
                     name="empresaId"
@@ -285,7 +285,7 @@ export function UsersActionDialog({
                 </div>
               )}
 
-              <div className="flex justify-between items-start gap-x-3">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-3">
                 <FormField
                   control={form.control}
                   name="primer_nombre"
@@ -334,7 +334,7 @@ export function UsersActionDialog({
                 />
               </div>
 
-              <div className="flex justify-between items-start gap-x-3">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-3">
                 <FormField
                   control={form.control}
                   name="primer_apellido"
@@ -383,7 +383,7 @@ export function UsersActionDialog({
                 />
               </div>
 
-              <div className="flex justify-between items-start gap-x-3">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-3">
                 <FormField
                   control={form.control}
                   name="email"
@@ -466,7 +466,7 @@ export function UsersActionDialog({
                 />
               )}
 
-              <div className="flex justify-between items-start gap-x-3">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-3">
                 <FormField
                   control={form.control}
                   name="password"
