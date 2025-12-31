@@ -1,6 +1,12 @@
 "use client";
 
-import { Download, UserPlus, FileDown, ChevronDown } from "lucide-react";
+import {
+  Download,
+  UserPlus,
+  FileDown,
+  ChevronDown,
+  Loader2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useClients } from "./clients-provider";
 import {
@@ -22,14 +28,18 @@ import { exportClientsToExcel } from "../_utils/excel-export";
 import { exportClientsToPdf } from "../_utils/pdf-export";
 import { useConfetti } from "@/hooks/use-confetti";
 import Realistic from "react-canvas-confetti/dist/presets/realistic";
+import { useState } from "react";
 
 export function ClientsPrimaryButtons() {
+  const [isLoading, setIsLoading] = useState(false);
   const { setOpen } = useClients();
   const { authUser } = useAuth();
   const { onInitHandler, onShoot } = useConfetti();
 
   const handleExportExcel = async () => {
     try {
+      setIsLoading(true);
+
       const { clientes, tiposDocumento } = await getClients(authUser?.id || "");
 
       const result = exportClientsToExcel({ clientes, tiposDocumento });
@@ -70,11 +80,15 @@ export function ClientsPrimaryButtons() {
       }
     } catch (error) {
       toast.error("¡Error al exportar clientes en formato Excel (.xlsx)!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleExportPdf = async () => {
     try {
+      setIsLoading(true);
+
       const { clientes } = await getClients(authUser?.id || "");
 
       const result = exportClientsToPdf({ clientes });
@@ -115,6 +129,8 @@ export function ClientsPrimaryButtons() {
       }
     } catch (error) {
       toast.error("¡Error al exportar clientes en formato PDF (.pdf)!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -124,9 +140,19 @@ export function ClientsPrimaryButtons() {
         <div className="w-full flex flex-col md:flex-row justify-center md:justify-end gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="space-x-2">
-                <FileDown size={18} />
-                <span>Exportar clientes</span>
+              <Button
+                disabled={isLoading}
+                variant="outline"
+                className="space-x-2"
+              >
+                {isLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <FileDown size={18} />
+                )}
+                <span>
+                  {isLoading ? "Exportando clientes..." : "Exportar clientes"}
+                </span>
                 <ChevronDown
                   size={16}
                   className="transition-transform group-data-[state=open]:rotate-180"
@@ -178,6 +204,7 @@ export function ClientsPrimaryButtons() {
             </DropdownMenuContent>
           </DropdownMenu>
           <Button
+            disabled={isLoading}
             variant="outline"
             className="space-x-1"
             onClick={() => setOpen("import")}

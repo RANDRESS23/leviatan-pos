@@ -357,7 +357,7 @@ export function ClientsImportDialog({
           </DialogClose>
           <Button disabled={isLoading} type="submit" form="client-import-form">
             {isLoading ? <Loader2 className="animate-spin" /> : <Download />}
-            {isLoading ? "Importando..." : "Importar"}
+            {isLoading ? "Importando clientes..." : "Importar clientes"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -50,7 +50,13 @@ export function DataTableViewOptions<TData>({
                       ? "Estado"
                       : column.id === "id"
                         ? "ID"
-                        : column.id;
+                        : column.id === "tipoProveedor"
+                          ? "Tipo Proveedor"
+                          : column.id === "descripcion"
+                            ? "Descripción"
+                            : column.id === "nit"
+                              ? "NIT"
+                              : column.id;
 
             return (
               <DropdownMenuCheckboxItem
