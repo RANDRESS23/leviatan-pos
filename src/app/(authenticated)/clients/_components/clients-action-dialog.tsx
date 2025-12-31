@@ -196,7 +196,7 @@ export function ClientsActionDialog({
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-4 px-0.5"
             >
-              <div className="flex justify-between items-start gap-x-3">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-3">
                 <FormField
                   control={form.control}
                   name="tipoDocumentoId"
@@ -255,7 +255,7 @@ export function ClientsActionDialog({
                 />
               </div>
 
-              <div className="flex justify-between items-start gap-x-3">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-3">
                 <FormField
                   control={form.control}
                   name="primer_nombre"
@@ -304,7 +304,7 @@ export function ClientsActionDialog({
                 />
               </div>
 
-              <div className="flex justify-between items-start gap-x-3">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-3">
                 <FormField
                   control={form.control}
                   name="primer_apellido"
@@ -353,7 +353,7 @@ export function ClientsActionDialog({
                 />
               </div>
 
-              <div className="flex justify-between items-start gap-x-3">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-3">
                 <FormField
                   control={form.control}
                   name="email"

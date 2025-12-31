@@ -66,12 +66,12 @@ export const generateExcelTemplate = () => {
       },
       fill: { 
         patternType: "solid",
-        fgColor: { rgb: "F2F2F2" }
+        fgColor: { rgb: "E3F2FD" }
       },
       alignment: { 
         horizontal: "center", 
         vertical: "center",
-        wrapText: true
+        wrapText: false
       },
       border: {
         top: { style: "thin", color: { auto: 1 } },
@@ -85,17 +85,46 @@ export const generateExcelTemplate = () => {
   // Configurar anchos de columna
   const colWidths = [
     { wch: 15 }, // primer_nombre
-    { wch: 15 }, // segundo_nombre
+    { wch: 17 }, // segundo_nombre
     { wch: 15 }, // primer_apellido
-    { wch: 15 }, // segundo_apellido
+    { wch: 17 }, // segundo_apellido
     { wch: 20 }, // tipo_documento
-    { wch: 12 }, // numero_documento
+    { wch: 20 }, // numero_documento
     { wch: 28 }, // email
     { wch: 12 }, // telefono
     { wch: 25 }, // direccion
     { wch: 8 },  // estado
   ];
   ws['!cols'] = colWidths;
+
+  // Estilo para datos
+  const dataStyle = {
+    font: { sz: 11 },
+    alignment: { 
+      horizontal: "left", 
+      vertical: "center",
+      wrapText: true
+    },
+    border: {
+      top: { style: "thin", color: { auto: 1 } },
+      bottom: { style: "thin", color: { auto: 1 } },
+      left: { style: "thin", color: { auto: 1 } },
+      right: { style: "thin", color: { auto: 1 } }
+    }
+  };
+
+  // Aplicar estilos a la hoja de clientes
+  const rangeClientes = XLSX.utils.decode_range(ws['!ref'] || 'A1:J1');
+
+  // Aplicar estilos a datos
+  for (let row = 1; row <= rangeClientes.e.r; row++) {
+    for (let col = rangeClientes.s.c; col <= rangeClientes.e.c; col++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+      if (!ws[cellAddress]) continue;
+      
+      ws[cellAddress].s = dataStyle;
+    }
+  }
 
   // Agregar la hoja de clientes al workbook
   XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
@@ -152,6 +181,18 @@ export const generateExcelTemplate = () => {
     };
   }
 
+  // Aplicar estilos a hoja de tipos de documento
+  const rangeTiposDoc = XLSX.utils.decode_range(ws_tipos['!ref'] || 'A1:B1');
+
+  for (let row = 1; row <= rangeTiposDoc.e.r; row++) {
+    for (let col = rangeTiposDoc.s.c; col <= rangeTiposDoc.e.c; col++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+      if (!ws_tipos[cellAddress]) continue;
+      
+      ws_tipos[cellAddress].s = dataStyle;
+    }
+  }
+
   // Configurar anchos para la segunda hoja
   ws_tipos['!cols'] = [
     { wch: 50 }, // Tipo de Documento
@@ -201,6 +242,18 @@ export const generateExcelTemplate = () => {
         right: { style: "thin", color: { auto: 1 } }
       }
     };
+  }
+
+  // Aplicar estilos a hoja de estados
+  const rangeEstados = XLSX.utils.decode_range(ws_tiposEstado['!ref'] || 'A1:B1'); 
+
+  for (let row = 1; row <= rangeEstados.e.r; row++) {
+    for (let col = rangeEstados.s.c; col <= rangeEstados.e.c; col++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+      if (!ws_tiposEstado[cellAddress]) continue;
+      
+      ws_tiposEstado[cellAddress].s = dataStyle;
+    }
   }
 
   // Configurar anchos para la tercera hoja
