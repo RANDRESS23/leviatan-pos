@@ -70,7 +70,8 @@ export const createUser = async (data: UserForm, isSuperAdmin: boolean) => {
         email: { 
           equals: data.email, 
           mode: "insensitive" 
-        }
+        },
+        empresaId: data.empresaId,
       },
       select: { id: true }
     })
@@ -89,7 +90,8 @@ export const createUser = async (data: UserForm, isSuperAdmin: boolean) => {
         telefono: { 
           equals: data.telefono, 
           mode: "insensitive" 
-        }
+        },
+        empresaId: data.empresaId,
       },
       select: { id: true }
     })
@@ -107,7 +109,7 @@ export const createUser = async (data: UserForm, isSuperAdmin: boolean) => {
 
     if (isSuperAdmin) {
       const rolCeo = await db.rol.findUnique({
-        where: { nombre: "CEO", empresaId: data.empresaId },
+        where: { empresaId_nombre: { empresaId: data.empresaId, nombre: "CEO" } },
         select: { id: true }
       })
   
@@ -216,6 +218,7 @@ export const updateUser = async (data: UserForm, isSuperAdmin: boolean) => {
           equals: data.email, 
           mode: "insensitive" 
         },
+        empresaId: data.empresaId,
         id: { 
           not: data.id 
         }
@@ -238,6 +241,7 @@ export const updateUser = async (data: UserForm, isSuperAdmin: boolean) => {
           equals: data.telefono, 
           mode: "insensitive" 
         },
+        empresaId: data.empresaId,
         id: { 
           not: data.id 
         }

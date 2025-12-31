@@ -56,8 +56,8 @@ model Usuario {
   segundo_nombre   String? @db.VarChar(50)
   primer_apellido  String  @db.VarChar(50)
   segundo_apellido String? @db.VarChar(50)
-  email            String  @unique @db.VarChar(50)
-  telefono         String  @unique @db.VarChar(20)
+  email            String  @db.VarChar(50)
+  telefono         String  @db.VarChar(20)
   activo           Boolean @default(true)
   password         String
 
@@ -74,6 +74,8 @@ model Usuario {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([empresaId, email])
+  @@unique([empresaId, telefono])
   @@index([empresaId])
   @@index([activo])
 }
@@ -97,9 +99,9 @@ model Cliente {
   primer_apellido  String  @db.VarChar(50)
   segundo_apellido String? @db.VarChar(50)
   tipoDocumentoId  String
-  numeroDocumento  String  @unique @db.VarChar(20)
-  email            String  @unique @db.VarChar(50)
-  telefono         String  @unique @db.VarChar(20)
+  numeroDocumento  String  @db.VarChar(20)
+  email            String  @db.VarChar(50)
+  telefono         String  @db.VarChar(20)
   direccion        String  @db.VarChar(50)
   activo           Boolean @default(true)
 
@@ -110,6 +112,9 @@ model Cliente {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([empresaId, numeroDocumento])
+  @@unique([empresaId, email])
+  @@unique([empresaId, telefono])
   @@index([empresaId])
   @@index([tipoDocumentoId])
   @@index([activo])
@@ -118,7 +123,7 @@ model Cliente {
 model Rol {
   id          String  @id @default(uuid())
   empresaId   String
-  nombre      String  @unique @db.VarChar(50)
+  nombre      String  @db.VarChar(50)
   descripcion String? @db.VarChar(100)
 
   empresa Empresa @relation(fields: [empresaId], references: [id])
@@ -129,6 +134,7 @@ model Rol {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([empresaId, nombre])
   @@index([empresaId])
 }
 
@@ -165,6 +171,7 @@ model Proveedor {
   telefono      String  @db.VarChar(20)
   direccion     String  @db.VarChar(100)
   tipoProveedor String  @db.VarChar(20) // Natural, Empresa
+  descripcion   String? @db.VarChar(100)
   activo        Boolean @default(true)
 
   empresa Empresa @relation(fields: [empresaId], references: [id])
@@ -174,6 +181,9 @@ model Proveedor {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([empresaId, nombre])
+  @@unique([empresaId, nit])
+  @@unique([empresaId, telefono])
   @@index([empresaId])
   @@index([activo])
 }

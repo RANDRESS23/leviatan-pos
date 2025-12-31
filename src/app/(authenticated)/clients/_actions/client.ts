@@ -45,7 +45,8 @@ export const createNewClient = async (data: ClientForm) => {
         numeroDocumento: { 
           equals: data.numeroDocumento, 
           mode: "insensitive" 
-        }
+        },
+        empresaId: data.empresaId
       },
       select: { id: true }
     })
@@ -64,7 +65,8 @@ export const createNewClient = async (data: ClientForm) => {
         email: { 
           equals: data.email, 
           mode: "insensitive" 
-        }
+        },
+        empresaId: data.empresaId
       },
       select: { id: true }
     })
@@ -83,7 +85,8 @@ export const createNewClient = async (data: ClientForm) => {
         telefono: { 
           equals: data.telefono, 
           mode: "insensitive" 
-        }
+        },
+        empresaId: data.empresaId
       },
       select: { id: true }
     })
@@ -135,6 +138,7 @@ export const updateClient = async (data: ClientForm) => {
           equals: data.numeroDocumento, 
           mode: "insensitive" 
         },
+        empresaId: data.empresaId,
         id: { 
           not: data.id 
         }
@@ -157,6 +161,7 @@ export const updateClient = async (data: ClientForm) => {
           equals: data.email, 
           mode: "insensitive" 
         },
+        empresaId: data.empresaId,
         id: { 
           not: data.id 
         }
@@ -179,6 +184,7 @@ export const updateClient = async (data: ClientForm) => {
           equals: data.telefono, 
           mode: "insensitive" 
         },
+        empresaId: data.empresaId,
         id: { 
           not: data.id 
         }
@@ -367,12 +373,30 @@ export const importClients = async (idUserLogged: string, clients: ImportedClien
 
     // Validar duplicados dentro del Excel
     const numerosDocumentoExcel = clients.map(c => c.numero_documento.toLowerCase().trim())
+    const telefonosExcel = clients.map(c => c.telefono?.toLowerCase().trim())
+    const emailsExcel = clients.map(c => c.email?.toLowerCase().trim())
     const duplicadosExcel = new Set<string>()
+    const duplicadosExcel2 = new Set<string>()
+    const duplicadosExcel3 = new Set<string>()
     
     for (let i = 0; i < numerosDocumentoExcel.length; i++) {
       const numDoc = numerosDocumentoExcel[i]
       if (numerosDocumentoExcel.indexOf(numDoc) !== i) {
         duplicadosExcel.add(numDoc)
+      }
+    }
+
+    for (let i = 0; i < telefonosExcel.length; i++) {
+      const telefono = telefonosExcel[i].toLowerCase().trim()
+      if (telefonosExcel.indexOf(telefono) !== i) {
+        duplicadosExcel2.add(telefono)
+      }
+    }
+
+    for (let i = 0; i < emailsExcel.length; i++) {
+      const email = emailsExcel[i].toLowerCase().trim()
+      if (emailsExcel.indexOf(email) !== i) {
+        duplicadosExcel3.add(email)
       }
     }
 
@@ -386,6 +410,52 @@ export const importClients = async (idUserLogged: string, clients: ImportedClien
           }
         })
         duplicadosConFilas.push(`• Documento "${numDoc}" repetido en filas: ${filas.join(', ')}`)
+      })
+      
+      return {
+        clientes: [],
+        statusCode: 400,
+        status: "error",
+        message: "Errores de validación en el archivo Excel:\n\n" + 
+                 "❌ Clientes duplicados en el Excel:\n" + 
+                 duplicadosConFilas.join('\n') + 
+                 "\n\n💡 Cada cliente debe aparecer una sola vez en el archivo Excel."
+      }
+    }
+
+    if (duplicadosExcel2.size > 0) {
+      const duplicadosConFilas: string[] = []
+      duplicadosExcel2.forEach(telefono => {
+        const filas: number[] = []
+        telefonosExcel.forEach((tel, index) => {
+          if (tel === telefono) {
+            filas.push(index + 2) // +2 porque: +1 para fila humana (no 0-indexed) y +1 porque headers están en fila 1
+          }
+        })
+        duplicadosConFilas.push(`• Teléfono "${telefono}" repetido en filas: ${filas.join(', ')}`)
+      })
+      
+      return {
+        clientes: [],
+        statusCode: 400,
+        status: "error",
+        message: "Errores de validación en el archivo Excel:\n\n" + 
+                 "❌ Clientes duplicados en el Excel:\n" + 
+                 duplicadosConFilas.join('\n') + 
+                 "\n\n💡 Cada cliente debe aparecer una sola vez en el archivo Excel."
+      }
+    }
+
+    if (duplicadosExcel3.size > 0) {
+      const duplicadosConFilas: string[] = []
+      duplicadosExcel3.forEach(email => {
+        const filas: number[] = []
+        emailsExcel.forEach((doc, index) => {
+          if (doc === email) {
+            filas.push(index + 2) // +2 porque: +1 para fila humana (no 0-indexed) y +1 porque headers están en fila 1
+          }
+        })
+        duplicadosConFilas.push(`• Email "${email}" repetido en filas: ${filas.join(', ')}`)
       })
       
       return {

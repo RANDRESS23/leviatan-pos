@@ -52,7 +52,8 @@ export const createRole = async (data: RoleForm) => {
         nombre: { 
           equals: data.nombre, 
           mode: "insensitive" 
-        } 
+        },
+        empresaId: data.empresaId,
       },
       select: { id: true }
     })
@@ -103,6 +104,7 @@ export const updateRole = async (data: RoleForm) => {
           equals: data.nombre, 
           mode: "insensitive" 
         },
+        empresaId: data.empresaId,
         id: { 
           not: data.id 
         }
