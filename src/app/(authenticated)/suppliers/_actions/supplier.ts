@@ -34,6 +34,44 @@ export const getSuppliers = async (idUserLogged: string) => {
   }
 };
 
+export const getSupplierById = async (id: string) => {
+  try {
+    const proveedor = await db.proveedor.findUnique({
+      where: { id },
+      include: { 
+        compras: { select: { id: true } },
+      }
+    });
+
+    if (!proveedor) {
+      return { proveedor: {}, hasPurchases: false, statusCode: 404, status: "error", message: "¡No se encontró al proveedor!" };
+    }
+
+    const hasPurchases = proveedor.compras.length > 0;
+    
+    return { proveedor, hasPurchases, statusCode: 200, status: "success", message: "Proveedor obtenido exitosamente!" };
+  } catch (error) {
+    console.error("Error al obtener el proveedor:", error);
+
+    return { proveedor: {}, hasPurchases: false, statusCode: 500, status: "error", message: "¡Error al obtener el proveedor!" };
+  }
+};
+
+export const deleteSupplierById = async (id: string) => {
+  try {
+    await db.proveedor.delete({
+      where: { id },
+    });
+    
+    revalidatePath("/suppliers");
+    return { statusCode: 200, status: "success", message: "Proveedor eliminado exitosamente!" };
+  } catch (error) {
+    console.error("Error al eliminar el proveedor:", error);
+
+    return { statusCode: 500, status: "error", message: "¡Error al eliminar el proveedor!" };
+  }
+};
+
 export const createNewSupplier = async (data: SupplierForm) => {
   try {
     const isExistsSupplierWithSameNit = await db.proveedor.findFirst({

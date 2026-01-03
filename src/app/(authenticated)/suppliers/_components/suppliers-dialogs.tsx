@@ -5,6 +5,7 @@ import { useSuppliers } from "./suppliers-provider";
 import { SuppliersImportDialog } from "./suppliers-import-dialog";
 import { useConfetti } from "@/hooks/use-confetti";
 import Realistic from "react-canvas-confetti/dist/presets/realistic";
+import { SuppliersDeleteDialog } from "./suppliers-delete-dialog";
 
 export function SuppliersDialogs() {
   const { open, setOpen, currentRow, setCurrentRow } = useSuppliers();
@@ -33,6 +34,19 @@ export function SuppliersDialogs() {
             open={open === "edit"}
             onOpenChange={() => {
               setOpen("edit");
+              setTimeout(() => {
+                setCurrentRow(null);
+              }, 500);
+            }}
+            currentRow={currentRow}
+            onShoot={onShoot}
+          />
+
+          <SuppliersDeleteDialog
+            key={`user-delete-${currentRow.id}`}
+            open={open === "delete"}
+            onOpenChange={() => {
+              setOpen("delete");
               setTimeout(() => {
                 setCurrentRow(null);
               }, 500);
