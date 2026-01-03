@@ -38,6 +38,44 @@ export const getClients = async (idUserLogged: string) => {
   }
 };
 
+export const getClientById = async (id: string) => {
+  try {
+    const cliente = await db.cliente.findUnique({
+      where: { id },
+      include: { 
+        ventas: { select: { id: true } },
+      }
+    });
+
+    if (!cliente) {
+      return { cliente: {}, hasPurchases: false, statusCode: 404, status: "error", message: "¡No se encontró al cliente!" };
+    }
+
+    const hasPurchases = cliente.ventas.length > 0;
+    
+    return { cliente, hasPurchases, statusCode: 200, status: "success", message: "Cliente obtenido exitosamente!" };
+  } catch (error) {
+    console.error("Error al obtener el cliente:", error);
+
+    return { cliente: {}, hasPurchases: false, statusCode: 500, status: "error", message: "¡Error al obtener el cliente!" };
+  }
+};
+
+export const deleteClientById = async (id: string) => {
+  try {
+    await db.cliente.delete({
+      where: { id },
+    });
+    
+    revalidatePath("/clients");
+    return { statusCode: 200, status: "success", message: "Cliente eliminado exitosamente!" };
+  } catch (error) {
+    console.error("Error al eliminar el cliente:", error);
+
+    return { statusCode: 500, status: "error", message: "¡Error al eliminar el cliente!" };
+  }
+};
+
 export const createNewClient = async (data: ClientForm) => {
   try {
     const isExistsClientWithSameDocument = await db.cliente.findFirst({

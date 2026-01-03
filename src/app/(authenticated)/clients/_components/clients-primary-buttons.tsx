@@ -143,7 +143,7 @@ export function ClientsPrimaryButtons() {
               <Button
                 disabled={isLoading}
                 variant="outline"
-                className="space-x-2"
+                className="space-x-1"
               >
                 {isLoading ? (
                   <Loader2 className="animate-spin" />

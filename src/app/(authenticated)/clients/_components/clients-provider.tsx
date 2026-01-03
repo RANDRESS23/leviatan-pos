@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import useDialogState from "@/hooks/use-dialog-state";
 import { type Client } from "../_data/schema";
 
-type ClientsDialogType = "add" | "edit" | "import";
+type ClientsDialogType = "add" | "edit" | "delete" | "import";
 
 type ClientsContextType = {
   open: ClientsDialogType | null;

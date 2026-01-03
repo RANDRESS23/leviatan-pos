@@ -6,6 +6,7 @@ import { type TypeDocument } from "../_data/schema";
 import { ClientsImportDialog } from "./clients-import-dialog";
 import { useConfetti } from "@/hooks/use-confetti";
 import Realistic from "react-canvas-confetti/dist/presets/realistic";
+import { ClientsDeleteDialog } from "./clients-delete-dialog";
 
 type ClientsDialogsProps = {
   tiposDocumento: TypeDocument[];
@@ -45,6 +46,19 @@ export function ClientsDialogs({ tiposDocumento }: ClientsDialogsProps) {
             }}
             currentRow={currentRow}
             tiposDocumento={tiposDocumento}
+            onShoot={onShoot}
+          />
+
+          <ClientsDeleteDialog
+            key={`user-delete-${currentRow.id}`}
+            open={open === "delete"}
+            onOpenChange={() => {
+              setOpen("delete");
+              setTimeout(() => {
+                setCurrentRow(null);
+              }, 500);
+            }}
+            currentRow={currentRow}
             onShoot={onShoot}
           />
         </>

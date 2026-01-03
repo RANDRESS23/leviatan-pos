@@ -1,0 +1,105 @@
+"use client";
+
+import { useState } from "react";
+import { AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { type Client } from "../_data/schema";
+import { deleteClientById } from "../_actions/client";
+import { toast } from "sonner";
+
+type ClientDeleteDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  currentRow: Client;
+  onShoot: () => void;
+};
+
+export function ClientsDeleteDialog({
+  open,
+  onOpenChange,
+  currentRow,
+  onShoot,
+}: ClientDeleteDialogProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [value, setValue] = useState("");
+
+  const handleDelete = async () => {
+    try {
+      setIsLoading(true);
+
+      if (value.trim() !== currentRow.numeroDocumento) return;
+
+      const { statusCode, message } = await deleteClientById(currentRow.id);
+
+      if (statusCode === 200) {
+        toast.success(message);
+        onShoot();
+        onOpenChange(false);
+      } else toast.error(message);
+    } catch (error) {
+      console.log(error);
+
+      toast.error("¡Error al eliminar el cliente!");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <ConfirmDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      handleConfirm={handleDelete}
+      isLoading={isLoading}
+      disabled={value.trim() !== currentRow.numeroDocumento}
+      title={
+        <span className="text-destructive">
+          <AlertTriangle
+            className="me-1 inline-block stroke-destructive"
+            size={18}
+          />{" "}
+          Eliminar cliente
+        </span>
+      }
+      desc={
+        <div className="space-y-4">
+          <p className="mb-2">
+            ¿Estás seguro de que deseas eliminar a{" "}
+            <span className="font-bold">
+              {currentRow.primer_nombre} {currentRow.primer_apellido}
+            </span>
+            ?
+            <br />
+            Esta acción eliminará permanentemente al cliente con el número de
+            documento{" "}
+            <span className="font-bold">{currentRow.numeroDocumento}</span> del
+            sistema, debido a que este cliente no cuenta con compras en el
+            sistema.
+          </p>
+
+          <Label className="flex flex-col justify-start items-start my-2">
+            Número de documento del cliente:
+            <Input
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder="Escribe el número de documento para confirmar la eliminación."
+            />
+          </Label>
+
+          <Alert variant="destructive">
+            <AlertTitle>¡Advertencia!</AlertTitle>
+            <AlertDescription>
+              Ten cuidado, esta operación no se puede deshacer.
+            </AlertDescription>
+          </Alert>
+        </div>
+      }
+      confirmText={isLoading ? "Eliminando cliente..." : "Eliminar cliente"}
+      cancelBtnText="Cancelar"
+      destructive
+    />
+  );
+}

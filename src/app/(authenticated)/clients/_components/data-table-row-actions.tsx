@@ -2,24 +2,37 @@
 
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { type Row } from "@tanstack/react-table";
-import { FolderPen } from "lucide-react";
+import { FolderPen, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { type Client } from "../_data/schema";
 import { useClients } from "./clients-provider";
+import { getClientById } from "../_actions/client";
+import { useState } from "react";
 
 type DataTableRowActionsProps = {
   row: Row<Client>;
 };
 
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+  const [isAvailableToDelete, setIsAvailableToDelete] = useState(false);
   const { setOpen, setCurrentRow } = useClients();
+
+  const searchClient = async () => {
+    const { hasPurchases } = await getClientById(row.original.id);
+
+    if (!hasPurchases) {
+      setIsAvailableToDelete(true);
+    }
+  };
+
   return (
     <>
       <DropdownMenu modal={false}>
@@ -27,6 +40,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           <Button
             variant="ghost"
             className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+            onClick={searchClient}
           >
             <DotsHorizontalIcon className="h-4 w-4" />
             <span className="sr-only">Abrir menu</span>
@@ -45,6 +59,33 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
               <FolderPen size={16} />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
+          {isAvailableToDelete ? (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  setCurrentRow(row.original);
+                  setOpen("delete");
+                }}
+                className="text-red-500! cursor-pointer"
+              >
+                Eliminar
+                <DropdownMenuShortcut>
+                  <Trash2 size={16} />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </>
+          ) : (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="opacity-70" disabled>
+                Verificando...
+                <DropdownMenuShortcut>
+                  <Loader2 className="animate-spin" size={16} />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </>
