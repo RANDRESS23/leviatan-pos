@@ -170,7 +170,7 @@ export function UsersActionDialog({
 
   useEffect(() => {
     if (user && !isSuperAdmin) {
-      form.resetField("empresaId", { defaultValue: user.empresaId });
+      form.setValue("empresaId", user.empresaId);
     }
   }, [user]);
 

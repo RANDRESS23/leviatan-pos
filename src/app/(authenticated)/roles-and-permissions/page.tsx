@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function Companies() {
+export default async function RolesAndPermissions() {
   const supabase = await createClientForServer();
   const { data } = await supabase.auth.getUser();
 

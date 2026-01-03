@@ -87,7 +87,7 @@ export function RolesAndPermissionsActionDialog({
 
   useEffect(() => {
     if (user) {
-      form.resetField("empresaId", { defaultValue: user.empresaId });
+      form.setValue("empresaId", user.empresaId);
     }
   }, [user]);
 
