@@ -117,7 +117,7 @@ export function ClientsActionDialog({
 
   useEffect(() => {
     if (user) {
-      form.resetField("empresaId", { defaultValue: user.empresaId });
+      form.setValue("empresaId", user.empresaId);
     }
   }, [user]);
 
